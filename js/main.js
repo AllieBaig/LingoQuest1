@@ -6,11 +6,11 @@
 // Timestamp: 2025-05-28
 // License: MIT License (https://opensource.org/licenses/MIT)
 
-import { profileManager } from './profileManager.js';
-import { uiModeManager } from './uiModeManager.js';
-import { updateVersionInfo } from './version.js';
-import { initXPTracker } from './xpTracker.js';
-import { loadQuestionPool } from './questionPool.js'; // Assuming this exists or will be created
+//import { profileManager } from './profileManager.js';
+//import { uiModeManager } from './uiModeManager.js';
+//import { updateVersionInfo } from './version.js';
+//import { initXPTracker } from './xpTracker.js';
+//import { loadQuestionPool } from './questionPool.js'; // Assuming this exists or will be created
 import { initSoloMode } from './modes/soloMode.js';
 import { initMixLingo } from './modes/mixLingo.js';
 // import { initWordRelic } from './modes/wordRelic.js'; // Placeholder
