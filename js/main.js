@@ -10,7 +10,7 @@ import { profileManager } from './profileManager.js';
 import { uiModeManager } from './uiModeManager.js';
 import { updateVersionInfo } from './version.js';
 import { initXPTracker } from './xpTracker.js';
-import { resetAnsweredQuestionsTracker } = from './questionPool.js'; // Import to reset session questions
+import { resetAnsweredQuestionsTracker } from './questionPool.js'; // Import to reset session questions
 
 // Game Modes Imports (placeholder for others)
 import * as mixLingo from '../scripts/modes/mixLingo.js';
