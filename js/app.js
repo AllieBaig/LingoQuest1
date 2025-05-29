@@ -4,11 +4,11 @@
 // app.js
 // Purpose: Main application orchestrator. Initializes user profile, applies themes,
 // and manages global application state.
-// Timestamp: 2025-05-29 08:44:36 PM BST
+// Timestamp: 2025-05-29 09:23:16 PM BST (Updated for optional chaining fix)
 
 import { profileManager } from './profileManager.js';
 import { applyTheme, initThemeToggle, getSpecificDateTheme, getRandomFestivalTheme, getRandomNationalDayTheme } from './themeManager.js';
-import { initializeUserProfile, updateAndPersistNickname } from './profileInitializer.js'; // Import new module
+import { initializeUserProfile, updateAndPersistNickname } from './profileInitializer.js';
 
 // Global variables (set by profileInitializer.js via `window` object)
 // window.profileID is set by profileInitializer.js
@@ -24,27 +24,29 @@ async function initializeApp() {
     const userProfile = await initializeUserProfile();
     
     // Update UI elements that display nickname (if any)
-    document.getElementById('nicknameDisplay')?.textContent = window.nickname;
+    const nicknameDisplayElement = document.getElementById('nicknameDisplay');
+    if (nicknameDisplayElement) { // Use a standard if check instead of optional chaining
+        nicknameDisplayElement.textContent = window.nickname;
+    }
     
     // Add event listener for nickname update (if an update button exists)
     const updateNicknameBtn = document.getElementById('updateNicknameBtn');
     if (updateNicknameBtn) {
         updateNicknameBtn.addEventListener('click', async () => {
             const newNickname = prompt('Enter new nickname:', window.nickname);
-            await updateAndPersistNickname(newNickname); // Call the extracted function
+            await updateAndPersistNickname(newNickname);
         });
     }
 
     // 2. Apply Theme based on profile settings and current date
-    const initialGameData = profileManager.getGameData(); // Get the latest game data from profileManager
+    const initialGameData = profileManager.getGameData();
     let themeToApply = initialGameData.currentTheme || 'default';
 
-    const specificDayTheme = getSpecificDateTheme(); // Check for specific date theme
+    const specificDayTheme = getSpecificDateTheme();
     if (specificDayTheme) {
         themeToApply = specificDayTheme;
         console.log(`[app.js] Overriding theme with specific date theme: ${themeToApply}`);
     } else {
-        // If no specific day theme, check user's preference
         if (themeToApply === 'random-festival') {
             themeToApply = getRandomFestivalTheme();
             console.log(`[app.js] Applying random festival theme: ${themeToApply}`);
@@ -54,14 +56,10 @@ async function initializeApp() {
         }
     }
     
-    // Apply the determined theme and initial dark mode setting
     applyTheme(themeToApply, initialGameData.darkMode);
-    // initThemeToggle is likely called by main.js now for user interaction,
-    // but ensuring initial state for dark mode is set is important here too.
     initThemeToggle(initialGameData.darkMode); 
 
     console.log('[app.js] Application initialization complete. Profile data and theme ready.');
 }
 
-// Automatically initialize the application when DOM content is loaded.
 document.addEventListener('DOMContentLoaded', initializeApp);
