@@ -137,7 +137,12 @@ async function initializeUserProfile() {
     profileManager.initGameData(userProfile.gameData);
 
     // Update UI elements that display nickname (if any)
-    document.getElementById('nicknameDisplay')?.textContent = window.nickname;
+    //document.getElementById('nicknameDisplay')?.textContent = window.nickname;
+
+    const nicknameDisplayElement = document.getElementById('nicknameDisplay');
+if (nicknameDisplayElement) {
+  nicknameDisplayElement.textContent = window.nickname;
+}
     
     // Add event listener for nickname update (e.g., from a settings modal)
     const updateNicknameBtn = document.getElementById('updateNicknameBtn'); // Assuming you'll add this button
