@@ -1,36 +1,24 @@
 // questionPool.js
-// Purpose: Manages loading, shuffling, and providing questions for game modes, including dynamic MCQ options.
+// Purpose: Manages loading vocabulary and dynamically generating questions for game modes.
 // Usage: Imported by main.js and game mode scripts.
-// Timestamp: 2025-05-29 03:19 AM BST
+// Timestamp: 2025-05-29 09:55:00 AM BST
 // License: MIT License (https://opensource.org/licenses/MIT)
 // Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
 
-let loadedQuestions = []; // All questions loaded for a mode
-let currentSessionQuestions = []; // Questions for the current session (unanswered)
-let answeredQuestionIds = new Set(); // To track answered questions within a session
-let currentQuestionIndex = -1;
+let loadedVocabulary = []; // All vocabulary entries
+let currentSessionVocabulary = []; // Vocabulary entries for the current session (unanswered)
+let answeredVocabularyIds = new Set(); // To track answered vocabulary IDs within a session
+let currentVocabularyIndex = -1;
 
-const QUESTION_DATA_PATHS = {
-    'solo': {
-        'fr': 'lang/solo-fr.json'
-    },
-    'mixlingo': {
-        'en': 'lang/mixlingo-en.json'
-        // Add other MixLingo languages as needed, e.g., 'es', 'de', 'it'
-    },
-    'wordrelic': {
-        'default': 'lang/wordrelic-en.json'
-    },
-    'wordsafari': {
-        'default': 'lang/wordsafari-en.json'
-    }
-};
-
+// Define the number of choices for each difficulty level
 const DIFFICULTY_CHOICES = {
     'easy': 2,
     'medium': 3,
     'hard': 4
 };
+
+// Define available target languages
+const AVAILABLE_ANSWER_LANGS = ['en', 'fr', 'de'];
 
 /**
  * Shuffles an array in place (Fisher-Yates algorithm).
@@ -44,97 +32,119 @@ function shuffleArray(array) {
 }
 
 /**
- * Loads questions for a given mode and language.
- * @param {string} mode - The game mode (e.g., 'solo', 'mixlingo').
- * @param {string} [lang='default'] - The language code (e.g., 'fr', 'en').
+ * Loads vocabulary from the JSON file.
+ * This is now the core data source for all generated questions.
  * @returns {Promise<void>}
  */
-export async function loadQuestionPool(mode, lang = 'default') {
-    const path = QUESTION_DATA_PATHS[mode]?.[lang] || QUESTION_DATA_PATHS[mode]?.['default'];
-
-    if (!path) {
-        throw new Error(`No question data path found for mode: ${mode} and language: ${lang}`);
-    }
-
+export async function loadVocabulary() {
     try {
-        const response = await fetch(path);
+        const response = await fetch('data/vocabulary.json'); // New path to generic vocabulary
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
-        loadedQuestions = data.questions; // Store all loaded questions
-        resetSessionQuestions(); // Initialize session questions
-        console.log(`Loaded ${loadedQuestions.length} total questions for ${mode} (${lang}).`);
+        loadedVocabulary = await response.json();
+        if (!Array.isArray(loadedVocabulary) || loadedVocabulary.length === 0) {
+            throw new Error("Loaded vocabulary is empty or not an array.");
+        }
+        resetSessionVocabulary(); // Initialize session vocabulary
+        console.log(`Loaded ${loadedVocabulary.length} vocabulary entries.`);
     } catch (error) {
-        console.error('Error loading question pool:', error);
+        console.error('Error loading vocabulary:', error);
         throw error;
     }
 }
 
 /**
- * Resets the pool of questions for the current session, excluding previously answered ones.
+ * Resets the pool of vocabulary entries for the current session, excluding previously answered ones.
  */
-export function resetSessionQuestions() {
-    currentSessionQuestions = loadedQuestions.filter(q => !answeredQuestionIds.has(q.id));
-    shuffleArray(currentSessionQuestions);
-    currentQuestionIndex = -1; // Reset index for a new session
-    console.log(`Initialized session with ${currentSessionQuestions.length} questions.`);
+export function resetSessionVocabulary() {
+    currentSessionVocabulary = loadedVocabulary.filter(vocab => !answeredVocabularyIds.has(vocab.id));
+    shuffleArray(currentSessionVocabulary);
+    currentVocabularyIndex = -1; // Reset index for a new session
+    console.log(`Initialized session with ${currentSessionVocabulary.length} vocabulary entries.`);
 }
 
 /**
- * Gets the next question from the pool, dynamically generating MCQ options based on difficulty.
+ * Gets the next question from the pool, dynamically generating MCQ options based on difficulty and target answer language.
+ * The clue will always be in English.
  * @param {string} difficulty - The difficulty level ('easy', 'medium', 'hard').
+ * @param {string} targetAnswerLang - The language for the MCQ options ('en', 'fr', 'de').
  * @returns {object | null} The next question object with generated options, or null if no more questions.
  */
-export function getNextQuestion(difficulty) {
-    currentQuestionIndex++;
-    if (currentQuestionIndex >= currentSessionQuestions.length) {
+export function getNextQuestion(difficulty, targetAnswerLang) {
+    if (!AVAILABLE_ANSWER_LANGS.includes(targetAnswerLang)) {
+        console.warn(`Invalid target answer language: ${targetAnswerLang}. Defaulting to 'en'.`);
+        targetAnswerLang = 'en';
+    }
+
+    currentVocabularyIndex++;
+    if (currentVocabularyIndex >= currentSessionVocabulary.length) {
         return null; // No more questions
     }
 
-    const question = { ...currentSessionQuestions[currentQuestionIndex] }; // Clone to avoid modifying original
+    const currentVocabEntry = currentSessionVocabulary[currentVocabularyIndex];
+    const clue = `What is '${currentVocabEntry.english}' in ${getLanguageName(targetAnswerLang)}?`;
+    const correctAnswerText = currentVocabEntry[targetAnswerLang];
 
     const numChoices = DIFFICULTY_CHOICES[difficulty] || DIFFICULTY_CHOICES['easy']; // Default to easy
 
-    // Generate distractors (incorrect options)
     const distractors = [];
-    const allCorrectAnswers = loadedQuestions
-        .map(q => q.correctAnswer)
-        .filter(answer => answer !== question.correctAnswer); // Don't include the current correct answer
+    const possibleDistractors = loadedVocabulary
+        .filter(vocab => vocab.id !== currentVocabEntry.id && vocab[targetAnswerLang]) // Exclude correct answer's entry
+        .map(vocab => vocab[targetAnswerLang]); // Get the translated word for distractors
 
-    // Shuffle all possible incorrect answers to pick random ones
-    shuffleArray(allCorrectAnswers);
+    shuffleArray(possibleDistractors);
 
-    // Add distractors up to numChoices - 1
-    for (let i = 0; i < numChoices - 1 && i < allCorrectAnswers.length; i++) {
-        // Ensure distractor is not already in the list of distractors
-        if (!distractors.includes(allCorrectAnswers[i])) {
-             distractors.push(allCorrectAnswers[i]);
+    // Add distractors up to numChoices - 1, ensuring no duplicates and that they are not the correct answer text
+    let addedCount = 0;
+    for (let i = 0; i < possibleDistractors.length && addedCount < (numChoices - 1); i++) {
+        const distractor = possibleDistractors[i];
+        if (distractor !== correctAnswerText && !distractors.includes(distractor)) {
+            distractors.push(distractor);
+            addedCount++;
         }
     }
 
     // Combine correct answer and distractors
-    const allOptions = [question.correctAnswer, ...distractors];
+    const allOptions = [correctAnswerText, ...distractors];
     shuffleArray(allOptions); // Shuffle the final options for display
 
-    question.options = allOptions; // Assign the newly generated options
-    return question;
+    return {
+        id: currentVocabEntry.id, // Use vocab ID for tracking
+        clue: clue,
+        options: allOptions,
+        correctAnswer: correctAnswerText // The correct answer text in the target language
+    };
 }
 
 /**
- * Marks a question as answered so it's not repeated in the current session.
- * @param {string} questionId - The ID of the question to mark as answered.
+ * Helper function to get a human-readable language name.
+ * @param {string} langCode - The language code (e.g., 'en', 'fr', 'de').
+ * @returns {string} The full language name.
  */
-export function markQuestionAsAnswered(questionId) {
-    answeredQuestionIds.add(questionId);
+function getLanguageName(langCode) {
+    switch (langCode) {
+        case 'en': return 'English';
+        case 'fr': return 'French';
+        case 'de': return 'German';
+        default: return langCode;
+    }
 }
 
 /**
- * Gets the total number of questions currently loaded (for the current session).
+ * Marks a vocabulary entry as answered so it's not repeated in the current session.
+ * @param {string} vocabId - The ID of the vocabulary entry to mark as answered.
+ */
+export function markQuestionAsAnswered(vocabId) {
+    answeredVocabularyIds.add(vocabId);
+}
+
+/**
+ * Gets the total number of vocabulary entries currently loaded (for the current session).
  * @returns {number}
  */
 export function getTotalQuestionsCount() {
-    return currentSessionQuestions.length;
+    return currentSessionVocabulary.length;
 }
 
 /**
@@ -142,14 +152,13 @@ export function getTotalQuestionsCount() {
  * @returns {number}
  */
 export function getRemainingQuestionsCount() {
-    return currentSessionQuestions.length - (currentQuestionIndex + 1);
+    return currentSessionVocabulary.length - (currentVocabularyIndex + 1);
 }
 
 /**
  * Resets the answered questions tracker and session pool for a new game session.
  */
 export function resetAnsweredQuestionsTracker() {
-    answeredQuestionIds.clear();
-    resetSessionQuestions(); // Regenerate session questions
+    answeredVocabularyIds.clear();
+    resetSessionVocabulary(); // Regenerate session questions
 }
-
