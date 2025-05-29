@@ -1,115 +1,111 @@
-// mixLingo.js
-// Purpose: Implements the MixLingo game mode logic.
-// Usage: Imported by main.js to start the game.
-// Timestamp: 2025-05-29 08:22 AM BST
+
+// js/modes/mixLingo.js
+// Purpose: Implements the MixLingo game mode logic, displaying questions and handling user input.
+// Usage: Imported by main.js.
+// Timestamp: 2025-05-29 10:11:00 AM BST
 // License: MIT License (https://opensource.org/licenses/MIT)
 // Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
 
-import { loadQuestionPool, getNextQuestion, markQuestionAsAnswered } from '../../js/questionPool.js';
-import { renderMCQOptions, resetMCQOptions } from '../../js/mcqAutoCheck.js';
-import { addXP, incrementStreak, resetStreak } from '../../js/xpTracker.js';
+import { getNextQuestion, getTotalQuestionsCount, getRemainingQuestionsCount, markQuestionAsAnswered } from '../questionPool.js';
+import { updateXP, updateStreak } from '../xpTracker.js';
+import { checkAnswerMCQ } from '../lib/mcqAutoCheck.js'; // Assuming this is in js/lib
 
-// UI Elements
-const sentenceClueEl = document.getElementById('sentenceClue');
-const mcqOptionsEl = document.getElementById('mcqOptions');
-const resultSummaryEl = document.getElementById('resultSummary');
+const sentenceClueElement = document.getElementById('sentenceClue');
+const mcqOptionsElement = document.getElementById('mcqOptions');
+const resultSummaryElement = document.getElementById('resultSummary');
 
-// Game state variables
 let currentQuestion = null;
-let currentLanguage = 'en';
-let currentDifficulty = 'easy'; // Default difficulty
+let currentDifficulty = 'easy'; // Default difficulty, will be set by init
+let currentAnswerLanguage = 'en'; // NEW: Default answer language, will be set by init
 
-/**
- * Initializes the MixLingo game mode.
- * @param {string} lang - The language for the questions (e.g., 'en').
- * @param {string} difficulty - The chosen difficulty level ('easy', 'medium', 'hard').
- */
-export async function init(lang, difficulty) {
-    console.log(`Starting MixLingo in ${lang} with ${difficulty} difficulty.`);
-    currentLanguage = lang;
-    currentDifficulty = difficulty; // Store the chosen difficulty
-    await loadQuestionPool('mixlingo', currentLanguage);
-    resultSummaryEl.innerHTML = ''; // Clear previous results
+export const init = async (questionLang, difficulty, answerLang) => {
+    console.log(`MixLingo Init: Question Language: ${questionLang}, Difficulty: ${difficulty}, Answer Language: ${answerLang}`);
+    currentDifficulty = difficulty;
+    currentAnswerLanguage = answerLang; // Store the selected answer language
+
+    // Clear previous game state
+    reset();
     displayNextQuestion();
-}
+};
 
-/**
- * Displays the next question in the game.
- */
-function displayNextQuestion() {
-    currentQuestion = getNextQuestion(currentDifficulty); // Pass difficulty to getNextQuestion
-    if (currentQuestion) {
-        sentenceClueEl.textContent = currentQuestion.clue;
-        resetMCQOptions(mcqOptionsEl); // Clear previous options
-        renderMCQOptions(
-            mcqOptionsEl,
-            currentQuestion.options,
-            currentQuestion.correctAnswer,
-            handleOptionSelection
-        );
-        resultSummaryEl.style.display = 'none'; // Hide result summary
-        mcqOptionsEl.style.display = 'grid'; // Show MCQ options
-    } else {
-        endGame();
-    }
-}
-
-/**
- * Handles the user's selection of an MCQ option.
- * @param {boolean} isCorrect - True if the selected option is correct.
- * @param {string} selectedAnswer - The text of the selected answer.
- */
-function handleOptionSelection(isCorrect, selectedAnswer) {
-    mcqOptionsEl.style.display = 'none'; // Hide options after selection
-    resultSummaryEl.style.display = 'flex'; // Show result summary
-
-    let feedbackMessage = '';
-    if (isCorrect) {
-        feedbackMessage = "Correct!";
-        addXP(10); // Example XP gain
-        incrementStreak();
-        markQuestionAsAnswered(currentQuestion.id);
-    } else {
-        feedbackMessage = `Incorrect. The answer was: ${currentQuestion.correctAnswer}`;
-        resetStreak();
-    }
-    resultSummaryEl.innerHTML = `
-        <p>${feedbackMessage}</p>
-        <button id="nextQuestionBtn">Next Question</button>
-    `;
-
-    document.getElementById('nextQuestionBtn').addEventListener('click', displayNextQuestion);
-}
-
-/**
- * Ends the game session when no more questions are available.
- */
-function endGame() {
-    sentenceClueEl.textContent = "No more questions!";
-    resetMCQOptions(mcqOptionsEl);
-    resultSummaryEl.innerHTML = `
-        <p>You've completed all available questions for this mode!</p>
-        <button id="restartGameBtn">Play Again</button>
-        <button id="backToModesBtn">Back to Modes</button>
-    `;
-    document.getElementById('restartGameBtn').addEventListener('click', () => {
-        // This will reload the questions for the current difficulty
-        init(currentLanguage, currentDifficulty);
-    });
-    document.getElementById('backToModesBtn').addEventListener('click', () => {
-        // Assuming main.js handles showing mode selection
-        window.location.reload(); // Simple way to go back to modes for now
-    });
-}
-
-/**
- * Resets the game mode state. Used when switching modes or restarting.
- */
-export function reset() {
-    sentenceClueEl.textContent = '';
-    resetMCQOptions(mcqOptionsEl);
-    resultSummaryEl.innerHTML = '';
+export const reset = () => {
+    sentenceClueElement.textContent = '';
+    mcqOptionsElement.innerHTML = '';
+    resultSummaryElement.innerHTML = '';
     currentQuestion = null;
-    currentQuestionIndex = -1; // Reset question index
-    // No need to reset answeredQuestionIds here, questionPool does it via resetAnsweredQuestionsTracker
-}
+};
+
+const displayNextQuestion = () => {
+    mcqOptionsElement.innerHTML = ''; // Clear previous options
+    resultSummaryElement.innerHTML = ''; // Clear previous result summary
+
+    // Get the next question, passing the current difficulty and the selected answer language
+    currentQuestion = getNextQuestion(currentDifficulty, currentAnswerLanguage);
+
+    if (currentQuestion) {
+        sentenceClueElement.textContent = currentQuestion.clue;
+        currentQuestion.options.forEach(option => {
+            const button = document.createElement('button');
+            button.textContent = option;
+            button.classList.add('mcq-option');
+            button.addEventListener('click', () => handleAnswer(option));
+            mcqOptionsElement.appendChild(button);
+        });
+        console.log(`Question: ${currentQuestion.clue}`);
+        console.log(`Correct Answer (in ${currentAnswerLanguage}): ${currentQuestion.correctAnswer}`);
+    } else {
+        sentenceClueElement.textContent = 'No more questions! Game Over.';
+        mcqOptionsElement.innerHTML = '';
+        displayEndGameSummary();
+    }
+};
+
+const handleAnswer = (selectedAnswer) => {
+    if (!currentQuestion) return;
+
+    const isCorrect = checkAnswerMCQ(selectedAnswer, currentQuestion.correctAnswer);
+    markQuestionAsAnswered(currentQuestion.id); // Mark the vocabulary ID as answered
+
+    if (isCorrect) {
+        updateXP(10); // Award XP for correct answer
+        updateStreak(true); // Increase streak
+        resultSummaryElement.textContent = `Correct! Well done! 🎉`;
+        resultSummaryElement.style.color = 'var(--primary-color)';
+    } else {
+        updateXP(-5); // Deduct XP for incorrect answer
+        updateStreak(false); // Reset streak
+        resultSummaryElement.textContent = `Incorrect. The correct answer was "${currentQuestion.correctAnswer}". 🙁`;
+        resultSummaryElement.style.color = 'red';
+    }
+
+    // Disable all options after an answer is selected
+    Array.from(mcqOptionsElement.children).forEach(button => {
+        button.disabled = true;
+        if (button.textContent === currentQuestion.correctAnswer) {
+            button.classList.add('correct');
+        } else if (button.textContent === selectedAnswer) {
+            button.classList.add('incorrect');
+        }
+    });
+
+    setTimeout(() => {
+        displayNextQuestion(); // Move to the next question after a brief delay
+    }, 1500); // 1.5 seconds delay
+};
+
+const displayEndGameSummary = () => {
+    // You can add more detailed end-game summary here
+    resultSummaryElement.innerHTML = `
+        <h3>Game Over!</h3>
+        <p>You've completed all available questions!</p>
+        <button id="playAgainBtn">Play Again</button>
+    `;
+    const playAgainBtn = document.getElementById('playAgainBtn');
+    if (playAgainBtn) {
+        playAgainBtn.addEventListener('click', () => {
+            // This will trigger a full reset and restart of the game mode
+            window.location.reload(); // Simple reload for full reset for now
+            // Or, more elegantly: profileManager.saveProfile(); resetAnsweredQuestionsTracker(); init(currentDifficulty, currentAnswerLanguage);
+        });
+    }
+};
