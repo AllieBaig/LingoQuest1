@@ -1,12 +1,14 @@
+// License: MIT License (https://opensource.org/licenses/MIT)
+// Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
 
 // app.js
 // Purpose: Manages the core application lifecycle, user profile initialization,
-// and interaction with the profileManager for data persistence.
+// and interaction with the profileManager for data persistence and theme application.
 // This is the main orchestrator for user sessions.
-// Timestamp: 2025-05-29 06:07:02 PM BST
-// License: MIT License (https://opensource.org/licenses/MIT)
+// Timestamp: 2025-05-29 06:40:00 PM BST
 
 import { profileManager } from './profileManager.js';
+import { applyTheme, initThemeToggle, getSpecificDateTheme, getRandomFestivalTheme, getRandomNationalDayTheme } from './themeManager.js';
 
 // Define global variables for the current profile's ID and nickname.
 // These are exposed globally because other modules (like main.js)
@@ -33,6 +35,7 @@ const LOCAL_STORAGE_PROFILE_KEY = 'lingoQuestProfile';
  * @property {string} gameData.difficulty - Current difficulty setting (e.g., 'easy', 'medium', 'hard').
  * @property {boolean} gameData.darkMode - Dark mode preference.
  * @property {string} gameData.answerLanguage - Preferred language for answers.
+ * @property {string} gameData.currentTheme - User's chosen theme ('default', 'dark', 'diwali', etc. or 'random-festival', 'random-national-day').
  */
 
 /**
@@ -119,7 +122,8 @@ async function initializeUserProfile() {
                 textSize: 'normal',
                 difficulty: 'easy',
                 darkMode: false,
-                answerLanguage: 'en'
+                answerLanguage: 'en',
+                currentTheme: 'default' // Add default theme setting
             }
         };
         localStorage.setItem(LOCAL_STORAGE_PROFILE_KEY, JSON.stringify(userProfile));
@@ -167,7 +171,30 @@ async function initializeUserProfile() {
         simulateDbSaveProfile(userProfile); // Simulate DB save
     });
 
-    console.log('[app.js] Application initialization complete. Profile data ready.');
+    // --- Theme Application Logic ---
+    const initialGameData = profileManager.getGameData();
+    let themeToApply = initialGameData.currentTheme || 'default'; // Default to 'default' if not set
+
+    const specificDayTheme = getSpecificDateTheme(); // Check for specific date theme
+    if (specificDayTheme) {
+        themeToApply = specificDayTheme;
+        console.log(`[app.js] Overriding theme with specific date theme: ${themeToApply}`);
+    } else {
+        // If no specific day theme, check user's preference
+        if (themeToApply === 'random-festival') {
+            themeToApply = getRandomFestivalTheme();
+            console.log(`[app.js] Applying random festival theme: ${themeToApply}`);
+        } else if (themeToApply === 'random-national-day') {
+            themeToApply = getRandomNationalDayTheme();
+            console.log(`[app.js] Applying random national day theme: ${themeToApply}`);
+        }
+    }
+    
+    // Apply the determined theme and initial dark mode setting
+    applyTheme(themeToApply, initialGameData.darkMode);
+    initThemeToggle(initialGameData.darkMode); // Ensure dark mode class is set correctly (if not part of custom theme)
+
+    console.log('[app.js] Application initialization complete. Profile data and theme ready.');
 }
 
 // Automatically initialize the user profile when app.js loads.
