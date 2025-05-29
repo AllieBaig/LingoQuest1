@@ -12,7 +12,7 @@ import { initXPTracker } from './xpTracker.js';
 import { resetAnsweredQuestionsTracker } from './questionPool.js'; // Import to reset session questions
 
 // Game Modes Imports (placeholder for others)
-import * as mixLingo from '../scripts/modes/mixLingo.js';
+import * as mixLingo from '../js/modes/mixLingo.js';
 // import * as soloMode from '../scripts/modes/soloMode.js'; // Uncomment when ready
 
 // UI Elements
