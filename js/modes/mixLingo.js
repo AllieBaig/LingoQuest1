@@ -1,101 +1,115 @@
-
-
 // mixLingo.js
-// Purpose: Implements the MixLingo game mode (English sentence with foreign word blank, MCQ).
-// Usage: Called by main.js to initialize the game mode.
-// Timestamp: 2025-05-28
+// Purpose: Implements the MixLingo game mode logic.
+// Usage: Imported by main.js to start the game.
+// Timestamp: 2025-05-29 08:22 AM BST
 // License: MIT License (https://opensource.org/licenses/MIT)
+// Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
 
-import { getNextQuestion, markQuestionAsAnswered } from '../questionPool.js';
-import { renderMCQOptions, resetMCQOptions } from '../mcqAutoCheck.js';
-import { addXP, incrementStreak, resetStreak } from '../xpTracker.js';
+import { loadQuestionPool, getNextQuestion, markQuestionAsAnswered } from '../../js/questionPool.js';
+import { renderMCQOptions, resetMCQOptions } from '../../js/mcqAutoCheck.js';
+import { addXP, incrementStreak, resetStreak } from '../../js/xpTracker.js';
 
+// UI Elements
+const sentenceClueEl = document.getElementById('sentenceClue');
+const mcqOptionsEl = document.getElementById('mcqOptions');
+const resultSummaryEl = document.getElementById('resultSummary');
+
+// Game state variables
 let currentQuestion = null;
-let sentenceClueEl;
-let sentenceBuilderAreaEl; // Not strictly used for building, but can show the full sentence
-let mcqOptionsEl;
-let resultSummaryEl;
+let currentLanguage = 'en';
+let currentDifficulty = 'easy'; // Default difficulty
 
 /**
  * Initializes the MixLingo game mode.
- * @param {HTMLElement} clueEl - The DOM element for displaying the sentence clue.
- * @param {HTMLElement} builderEl - The DOM element for displaying the full sentence with blank.
- * @param {HTMLElement} mcqEl - The DOM element for MCQ options.
- * @param {HTMLElement} summaryEl - The DOM element for result summary.
- * @param {string} lang - The language for the blank (e.g., 'fr', 'es', 'de, 'it').
+ * @param {string} lang - The language for the questions (e.g., 'en').
+ * @param {string} difficulty - The chosen difficulty level ('easy', 'medium', 'hard').
  */
-export function initMixLingo(clueEl, builderEl, mcqEl, summaryEl, lang) {
-    sentenceClueEl = clueEl;
-    sentenceBuilderAreaEl = builderEl;
-    mcqOptionsEl = mcqEl;
-    resultSummaryEl = summaryEl;
-
-    console.log(`Starting MixLingo mode for blank in ${lang}.`);
-    startGameRound();
+export async function init(lang, difficulty) {
+    console.log(`Starting MixLingo in ${lang} with ${difficulty} difficulty.`);
+    currentLanguage = lang;
+    currentDifficulty = difficulty; // Store the chosen difficulty
+    await loadQuestionPool('mixlingo', currentLanguage);
+    resultSummaryEl.innerHTML = ''; // Clear previous results
+    displayNextQuestion();
 }
 
 /**
- * Starts a new game round.
+ * Displays the next question in the game.
  */
-function startGameRound() {
-    currentQuestion = getNextQuestion();
-
-    if (!currentQuestion) {
-        endGame();
-        return;
-    }
-
-    resetMCQOptions(mcqOptionsEl); // Clear previous MCQ options
-    sentenceBuilderAreaEl.innerHTML = ''; // Clear previous builder area
-    resultSummaryEl.textContent = ''; // Clear previous summary
-
-    // MixLingo clue will contain the sentence with a blank.
-    // Example: "The cat sat on the ____ (French: chat)."
-    sentenceClueEl.textContent = currentQuestion.clue;
-
-    // Render MCQ options
-    renderMCQOptions(mcqOptionsEl, currentQuestion.options, currentQuestion.correctAnswer, handleMCQSelection);
-}
-
-/**
- * Handles the selection of an MCQ option.
- * @param {boolean} isCorrect - True if the selected option is correct, false otherwise.
- * @param {string} selectedOption - The text of the selected option.
- */
-function handleMCQSelection(isCorrect, selectedOption) {
-    if (isCorrect) {
-        resultSummaryEl.textContent = 'Correct! 🎉';
-        addXP(15); // Award XP
-        incrementStreak(); // Increment streak
-        markQuestionAsAnswered(currentQuestion.id); // Mark as answered
+function displayNextQuestion() {
+    currentQuestion = getNextQuestion(currentDifficulty); // Pass difficulty to getNextQuestion
+    if (currentQuestion) {
+        sentenceClueEl.textContent = currentQuestion.clue;
+        resetMCQOptions(mcqOptionsEl); // Clear previous options
+        renderMCQOptions(
+            mcqOptionsEl,
+            currentQuestion.options,
+            currentQuestion.correctAnswer,
+            handleOptionSelection
+        );
+        resultSummaryEl.style.display = 'none'; // Hide result summary
+        mcqOptionsEl.style.display = 'grid'; // Show MCQ options
     } else {
-        resultSummaryEl.textContent = `Incorrect. The correct word was: "${currentQuestion.correctAnswer}"`;
-        resetStreak(); // Reset streak on incorrect answer
+        endGame();
     }
-
-    // Add a "Next Question" button
-    const nextButton = document.createElement('button');
-    nextButton.textContent = 'Next Question';
-    nextButton.classList.add('next-question-btn');
-    nextButton.addEventListener('click', startGameRound);
-    resultSummaryEl.appendChild(nextButton);
 }
 
 /**
- * Ends the game, displaying a summary.
+ * Handles the user's selection of an MCQ option.
+ * @param {boolean} isCorrect - True if the selected option is correct.
+ * @param {string} selectedAnswer - The text of the selected answer.
+ */
+function handleOptionSelection(isCorrect, selectedAnswer) {
+    mcqOptionsEl.style.display = 'none'; // Hide options after selection
+    resultSummaryEl.style.display = 'flex'; // Show result summary
+
+    let feedbackMessage = '';
+    if (isCorrect) {
+        feedbackMessage = "Correct!";
+        addXP(10); // Example XP gain
+        incrementStreak();
+        markQuestionAsAnswered(currentQuestion.id);
+    } else {
+        feedbackMessage = `Incorrect. The answer was: ${currentQuestion.correctAnswer}`;
+        resetStreak();
+    }
+    resultSummaryEl.innerHTML = `
+        <p>${feedbackMessage}</p>
+        <button id="nextQuestionBtn">Next Question</button>
+    `;
+
+    document.getElementById('nextQuestionBtn').addEventListener('click', displayNextQuestion);
+}
+
+/**
+ * Ends the game session when no more questions are available.
  */
 function endGame() {
-    sentenceClueEl.textContent = 'MixLingo Session Over!';
-    sentenceBuilderAreaEl.innerHTML = '';
+    sentenceClueEl.textContent = "No more questions!";
     resetMCQOptions(mcqOptionsEl);
-    resultSummaryEl.textContent = 'You have completed all available MixLingo questions.';
-    resetStreak(); // Reset streak at end of game session
-
-    // Add a button to restart or go back to mode selection
-    const restartButton = document.createElement('button');
-    restartButton.textContent = 'Play Again';
-    restartButton.addEventListener('click', () => {
-        window.location.reload(); // Simple reload to re-initialize
+    resultSummaryEl.innerHTML = `
+        <p>You've completed all available questions for this mode!</p>
+        <button id="restartGameBtn">Play Again</button>
+        <button id="backToModesBtn">Back to Modes</button>
+    `;
+    document.getElementById('restartGameBtn').addEventListener('click', () => {
+        // This will reload the questions for the current difficulty
+        init(currentLanguage, currentDifficulty);
     });
-    resultSummaryEl.appendChild(restartButton);
+    document.getElementById('backToModesBtn').addEventListener('click', () => {
+        // Assuming main.js handles showing mode selection
+        window.location.reload(); // Simple way to go back to modes for now
+    });
+}
+
+/**
+ * Resets the game mode state. Used when switching modes or restarting.
+ */
+export function reset() {
+    sentenceClueEl.textContent = '';
+    resetMCQOptions(mcqOptionsEl);
+    resultSummaryEl.innerHTML = '';
+    currentQuestion = null;
+    currentQuestionIndex = -1; // Reset question index
+    // No need to reset answeredQuestionIds here, questionPool does it via resetAnsweredQuestionsTracker
 }
