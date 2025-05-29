@@ -1,24 +1,30 @@
-
 // uiModeManager.js
-// Purpose: Manages UI themes (light/dark mode) and UI styles (normal/ASCII).
+// Purpose: Manages UI themes (light/dark mode) and UI styles (normal/ASCII) and text sizing.
 // Usage: Imported by main.js.
-// Timestamp: 2025-05-28 10:33 PM BST
+// Timestamp: 2025-05-29 03:09 AM BST
 // License: MIT License (https://opensource.org/licenses/MIT)
 // Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
 
 const DARK_MODE_KEY = 'lingoQuestDarkMode';
 const UI_MODE_KEY = 'lingoQuestUiMode';
+const TEXT_SIZE_KEY = 'lingoQuestTextSize'; // New key for text size preference
 
-/**
- * Manages the UI mode and dark mode settings.
- */
 export const uiModeManager = {
     /**
-     * Initializes the UI mode and dark mode based on saved preferences or system settings.
+     * Initializes the UI mode, dark mode, and text size based on saved preferences or system settings.
      */
     init() {
         this._applyDarkMode(this._getPreferredDarkMode());
         this._applyUiMode(this._getPreferredUiMode());
+        this._applyTextSize(this._getPreferredTextSize()); // Apply text size on init
+
+        // Event listener for Text Size selector (NEW)
+        const textSizeSelector = document.getElementById('textSizeSelector');
+        if (textSizeSelector) {
+            textSizeSelector.addEventListener('change', (event) => {
+                this.setTextSize(event.target.value);
+            });
+        }
     },
 
     /**
@@ -34,8 +40,12 @@ export const uiModeManager = {
      * @param {string} mode - The UI mode to apply.
      */
     setUiMode(mode) {
-        document.body.classList.remove('normal-ui', 'ascii-ui', 'minimal-ui'); // Remove all current UI mode classes
-        document.body.classList.add(mode + '-ui'); // Add the selected mode class
+        document.body.classList.remove('normal-ui', 'ascii-ui'); // Remove all current UI mode classes
+        if (mode === 'normal') {
+            document.body.classList.add('normal-ui');
+        } else if (mode === 'ascii') {
+            document.body.classList.add('ascii-ui');
+        }
         localStorage.setItem(UI_MODE_KEY, mode);
 
         // Enable/disable ASCII stylesheet based on mode
@@ -44,14 +54,32 @@ export const uiModeManager = {
             asciiStylesheet.disabled = (mode !== 'ascii');
         }
 
-        // Re-apply 'minimal-ui' if it's the base style
-        if (document.body.classList.contains('minimal-ui')) {
-            // We need to re-add minimal-ui if it was removed by classList.remove above
-            // But usually minimal-ui is applied directly via index.html body class
-            // This is a safety check:
-            if (!document.body.classList.contains('minimal-ui')) {
-                 document.body.classList.add('minimal-ui');
-            }
+        const uiModeSelector = document.getElementById('uiModeSelector');
+        if (uiModeSelector) {
+            uiModeSelector.value = mode; // Sync the dropdown
+        }
+    },
+
+    /**
+     * Sets the text size theme (e.g., 'normal', 'senior-big', 'senior-very-big'). (NEW FUNCTION)
+     * @param {string} sizeClass - The class to apply for text size.
+     */
+    setTextSize(sizeClass) {
+        // Remove existing size classes to ensure only one is active
+        document.body.classList.remove('senior-big', 'senior-very-big');
+
+        if (sizeClass === 'senior-big') {
+            document.body.classList.add('senior-big');
+        } else if (sizeClass === 'senior-very-big') {
+            document.body.classList.add('senior-very-big');
+        }
+        // If sizeClass is 'normal', no specific class is added, just remove others
+
+        localStorage.setItem(TEXT_SIZE_KEY, sizeClass); // Save preference
+
+        const textSizeSelector = document.getElementById('textSizeSelector');
+        if (textSizeSelector) {
+            textSizeSelector.value = sizeClass; // Sync the dropdown
         }
     },
 
@@ -77,6 +105,15 @@ export const uiModeManager = {
     },
 
     /**
+     * Gets the preferred text size setting from localStorage. (NEW FUNCTION)
+     * Defaults to 'normal' if not set.
+     * @returns {string} The preferred text size class.
+     */
+    _getPreferredTextSize() {
+        return localStorage.getItem(TEXT_SIZE_KEY) || 'normal';
+    },
+
+    /**
      * Applies the dark mode class to the body.
      * @param {boolean} isDark - True to apply dark mode, false to remove.
      */
@@ -93,15 +130,13 @@ export const uiModeManager = {
      * @param {string} mode - The UI mode to apply.
      */
     _applyUiMode(mode) {
-        // Ensure initial minimal-ui class is handled by HTML, then this manages dynamic changes
-        document.body.classList.remove('normal-ui', 'ascii-ui'); // Remove existing UI mode classes
+        document.body.classList.remove('normal-ui', 'ascii-ui');
         if (mode === 'normal') {
-            document.body.classList.add('normal-ui'); // Explicitly add for consistency if needed
+            document.body.classList.add('normal-ui');
         } else if (mode === 'ascii') {
             document.body.classList.add('ascii-ui');
         }
 
-        // Manage ASCII stylesheet enablement
         const asciiStylesheet = document.querySelector('link[href="css/ascii.css"]');
         if (asciiStylesheet) {
             asciiStylesheet.disabled = (mode !== 'ascii');
@@ -109,7 +144,27 @@ export const uiModeManager = {
 
         const uiModeSelector = document.getElementById('uiModeSelector');
         if (uiModeSelector) {
-            uiModeSelector.value = mode; // Sync the dropdown
+            uiModeSelector.value = mode;
+        }
+    },
+
+    /**
+     * Applies the text size class to the body. (NEW FUNCTION)
+     * @param {string} sizeClass - The text size class to apply.
+     */
+    _applyTextSize(sizeClass) {
+        // Ensure only one size class is active
+        document.body.classList.remove('senior-big', 'senior-very-big');
+        if (sizeClass === 'senior-big') {
+            document.body.classList.add('senior-big');
+        } else if (sizeClass === 'senior-very-big') {
+            document.body.classList.add('senior-very-big');
+        }
+
+        const textSizeSelector = document.getElementById('textSizeSelector');
+        if (textSizeSelector) {
+            textSizeSelector.value = sizeClass;
         }
     }
 };
+
