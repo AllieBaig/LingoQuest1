@@ -13,7 +13,7 @@ import { initXPTracker } from './xpTracker.js';
 import { loadVocabulary, resetAnsweredQuestionsTracker } from './questionPool.js';
 
 // Game Modes Imports (placeholder for others)
-import * as mixLingo from '../scripts/modes/mixLingo.js';
+import * as mixLingo from '../js/modes/mixLingo.js';
 // import * as soloMode from '../scripts/modes/soloMode.js'; // Uncomment when ready
 
 // UI Elements
