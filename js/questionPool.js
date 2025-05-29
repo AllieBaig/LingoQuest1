@@ -19,10 +19,10 @@ const QUESTION_DATA_PATHS = {
         // Add other MixLingo languages as needed, e.g., 'es', 'de', 'it'
     },
     'wordrelic': {
-        'default': 'lang/wordrelic.json'
+        'default': 'lang/wordrelic-en.json'
     },
     'wordsafari': {
-        'default': 'lang/wordsafari.json'
+        'default': 'lang/wordsafari-en.json'
     }
 };
 
