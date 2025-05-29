@@ -1,11 +1,13 @@
 // questionPool.js
-// Purpose: Manages loading, shuffling, and providing questions for game modes.
+// Purpose: Manages loading, shuffling, and providing questions for game modes, including dynamic MCQ options.
 // Usage: Imported by main.js and game mode scripts.
-// Timestamp: 2025-05-28
+// Timestamp: 2025-05-29 03:19 AM BST
 // License: MIT License (https://opensource.org/licenses/MIT)
+// Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
 
-let currentQuestions = [];
-let answeredQuestionIds = new Set(); // To track answered questions within a session/game run
+let loadedQuestions = []; // All questions loaded for a mode
+let currentSessionQuestions = []; // Questions for the current session (unanswered)
+let answeredQuestionIds = new Set(); // To track answered questions within a session
 let currentQuestionIndex = -1;
 
 const QUESTION_DATA_PATHS = {
@@ -22,6 +24,12 @@ const QUESTION_DATA_PATHS = {
     'wordsafari': {
         'default': 'lang/wordsafari.json'
     }
+};
+
+const DIFFICULTY_CHOICES = {
+    'easy': 2,
+    'medium': 3,
+    'hard': 4
 };
 
 /**
@@ -54,10 +62,9 @@ export async function loadQuestionPool(mode, lang = 'default') {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        currentQuestions = data.questions.filter(q => !answeredQuestionIds.has(q.id));
-        shuffleArray(currentQuestions);
-        currentQuestionIndex = -1; // Reset index for a new pool
-        console.log(`Loaded ${currentQuestions.length} questions for ${mode} (${lang}).`);
+        loadedQuestions = data.questions; // Store all loaded questions
+        resetSessionQuestions(); // Initialize session questions
+        console.log(`Loaded ${loadedQuestions.length} total questions for ${mode} (${lang}).`);
     } catch (error) {
         console.error('Error loading question pool:', error);
         throw error;
@@ -65,19 +72,57 @@ export async function loadQuestionPool(mode, lang = 'default') {
 }
 
 /**
- * Gets the next question from the pool.
- * @returns {object | null} The next question object, or null if no more questions.
+ * Resets the pool of questions for the current session, excluding previously answered ones.
  */
-export function getNextQuestion() {
-    currentQuestionIndex++;
-    if (currentQuestionIndex < currentQuestions.length) {
-        return currentQuestions[currentQuestionIndex];
-    }
-    return null; // No more questions
+export function resetSessionQuestions() {
+    currentSessionQuestions = loadedQuestions.filter(q => !answeredQuestionIds.has(q.id));
+    shuffleArray(currentSessionQuestions);
+    currentQuestionIndex = -1; // Reset index for a new session
+    console.log(`Initialized session with ${currentSessionQuestions.length} questions.`);
 }
 
 /**
- * Marks the current question as answered so it's not repeated in the current session.
+ * Gets the next question from the pool, dynamically generating MCQ options based on difficulty.
+ * @param {string} difficulty - The difficulty level ('easy', 'medium', 'hard').
+ * @returns {object | null} The next question object with generated options, or null if no more questions.
+ */
+export function getNextQuestion(difficulty) {
+    currentQuestionIndex++;
+    if (currentQuestionIndex >= currentSessionQuestions.length) {
+        return null; // No more questions
+    }
+
+    const question = { ...currentSessionQuestions[currentQuestionIndex] }; // Clone to avoid modifying original
+
+    const numChoices = DIFFICULTY_CHOICES[difficulty] || DIFFICULTY_CHOICES['easy']; // Default to easy
+
+    // Generate distractors (incorrect options)
+    const distractors = [];
+    const allCorrectAnswers = loadedQuestions
+        .map(q => q.correctAnswer)
+        .filter(answer => answer !== question.correctAnswer); // Don't include the current correct answer
+
+    // Shuffle all possible incorrect answers to pick random ones
+    shuffleArray(allCorrectAnswers);
+
+    // Add distractors up to numChoices - 1
+    for (let i = 0; i < numChoices - 1 && i < allCorrectAnswers.length; i++) {
+        // Ensure distractor is not already in the list of distractors
+        if (!distractors.includes(allCorrectAnswers[i])) {
+             distractors.push(allCorrectAnswers[i]);
+        }
+    }
+
+    // Combine correct answer and distractors
+    const allOptions = [question.correctAnswer, ...distractors];
+    shuffleArray(allOptions); // Shuffle the final options for display
+
+    question.options = allOptions; // Assign the newly generated options
+    return question;
+}
+
+/**
+ * Marks a question as answered so it's not repeated in the current session.
  * @param {string} questionId - The ID of the question to mark as answered.
  */
 export function markQuestionAsAnswered(questionId) {
@@ -85,11 +130,11 @@ export function markQuestionAsAnswered(questionId) {
 }
 
 /**
- * Gets the total number of questions currently loaded.
+ * Gets the total number of questions currently loaded (for the current session).
  * @returns {number}
  */
 export function getTotalQuestionsCount() {
-    return currentQuestions.length;
+    return currentSessionQuestions.length;
 }
 
 /**
@@ -97,14 +142,14 @@ export function getTotalQuestionsCount() {
  * @returns {number}
  */
 export function getRemainingQuestionsCount() {
-    return currentQuestions.length - (currentQuestionIndex + 1);
+    return currentSessionQuestions.length - (currentQuestionIndex + 1);
 }
 
 /**
- * Resets the answered questions tracker for a new game session.
+ * Resets the answered questions tracker and session pool for a new game session.
  */
-export function resetAnsweredQuestions() {
+export function resetAnsweredQuestionsTracker() {
     answeredQuestionIds.clear();
-    currentQuestionIndex = -1;
-    // Re-shuffle if needed, or reload based on game logic
+    resetSessionQuestions(); // Regenerate session questions
 }
+
