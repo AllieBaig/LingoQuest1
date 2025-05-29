@@ -1,8 +1,7 @@
-
 // main.js
 // Purpose: Main application entry point. Handles UI interactions, game mode switching, and core initializations.
 // Usage: Loaded by index.html as a module.
-// Timestamp: 2025-05-29 09:37 AM BST
+// Timestamp: 2025-05-29 10:05:00 AM BST
 // License: MIT License (https://opensource.org/licenses/MIT)
 // Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
 
@@ -10,10 +9,11 @@ import { profileManager } from './profileManager.js';
 import { uiModeManager } from './uiModeManager.js';
 import { updateVersionInfo } from './version.js';
 import { initXPTracker } from './xpTracker.js';
-import { resetAnsweredQuestionsTracker } from './questionPool.js'; // Import to reset session questions
+// Updated import: Now loading generic vocabulary instead of language-specific question pool
+import { loadVocabulary, resetAnsweredQuestionsTracker } from './questionPool.js';
 
 // Game Modes Imports (placeholder for others)
-import * as mixLingo from '../js/modes/mixLingo.js';
+import * as mixLingo from '../scripts/modes/mixLingo.js';
 // import * as soloMode from '../scripts/modes/soloMode.js'; // Uncomment when ready
 
 // UI Elements
@@ -24,11 +24,13 @@ const uiModeSelector = document.getElementById('uiModeSelector');
 const textSizeSelector = document.getElementById('textSizeSelector');
 const darkModeToggle = document.getElementById('darkModeToggle');
 const difficultySelector = document.getElementById('difficultySelector');
+const answerLanguageSelector = document.getElementById('answerLanguageSelector'); // NEW: In-game answer language selector
 
 // Game state
 let currentGameMode = null;
 const DIFFICULT_LEVEL_KEY = 'lingoQuestDifficulty'; // localStorage key for difficulty
-const SELECTED_LANGUAGE_KEY = 'lingoQuestSelectedLanguage'; // New localStorage key for selected language
+const SELECTED_LANGUAGE_KEY = 'lingoQuestSelectedLanguage'; // localStorage key for game mode language (English questions will follow this)
+const SELECTED_ANSWER_LANGUAGE_KEY = 'lingoQuestSelectedAnswerLanguage'; // NEW: localStorage key for answer language
 
 /**
  * Detects the operating system and adds a corresponding class to the body.
@@ -51,7 +53,8 @@ function detectOSAndApplyClass() {
 
 
 /**
- * Applies a language class to the body based on the selected language.
+ * Applies a language class to the body based on the selected game mode language.
+ * This primarily affects potential overall UI language adjustments, not answer language.
  * @param {string} langCode - The language code (e.g., 'en', 'fr', 'de').
  */
 function applyLanguageClass(langCode) {
@@ -64,8 +67,8 @@ function applyLanguageClass(langCode) {
     });
     // Add the new lang- class
     body.classList.add(`lang-${langCode}`);
-    localStorage.setItem(SELECTED_LANGUAGE_KEY, langCode); // Save selected language
-    console.log(`Language class applied: lang-${langCode}`);
+    localStorage.setItem(SELECTED_LANGUAGE_KEY, langCode); // Save selected mode language
+    console.log(`Game mode language class applied: lang-${langCode}`);
 }
 
 
@@ -83,14 +86,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     initXPTracker(); // Initialize XP bar and streak display
     updateVersionInfo(); // Display app version
 
-    // Apply last selected language class if available, default to English
+    // Apply last selected game mode language class (e.g., for clue language in general UI)
+    // The 'lang' attribute on game mode buttons (e.g., mixLingoBtn data-lang="en") will primarily dictate the game's question language,
+    // which for this feature is always English. This initial setting is more for general UI styling hooks.
     applyLanguageClass(localStorage.getItem(SELECTED_LANGUAGE_KEY) || 'en');
+
+    // Load ALL vocabulary for dynamic question generation
+    await loadVocabulary();
 
 
     // Set initial selector states based on loaded preferences
     uiModeSelector.value = localStorage.getItem('lingoQuestUiMode') || 'normal';
     textSizeSelector.value = localStorage.getItem('lingoQuestTextSize') || 'normal';
     difficultySelector.value = localStorage.getItem(DIFFICULT_LEVEL_KEY) || 'easy'; // Set default difficulty
+
+    // NEW: Initialize Answer Language Selector
+    answerLanguageSelector.value = localStorage.getItem(SELECTED_ANSWER_LANGUAGE_KEY) || 'en'; // Default to English answers
 
     // Event Listeners for UI controls
     darkModeToggle.addEventListener('click', uiModeManager.toggleDarkMode);
@@ -108,7 +119,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Event listener for Difficulty Selector
     difficultySelector.addEventListener('change', (event) => {
         localStorage.setItem(DIFFICULT_LEVEL_KEY, event.target.value);
-        console.log(`Difficulty set to: ${event.target.value}`);
+        console.log(`Difficulty set to: ${event.target.value}. Game will apply next round.`);
+        // Optionally, restart current game mode if difficulty changes mid-game, or just apply for next game
+    });
+
+    // NEW: Event listener for Answer Language Selector
+    answerLanguageSelector.addEventListener('change', (event) => {
+        localStorage.setItem(SELECTED_ANSWER_LANGUAGE_KEY, event.target.value);
+        console.log(`Answer language set to: ${event.target.value}. Game will apply next round.`);
+        // If a game is active, you might want to restart it to apply the new answer language immediately
+        if (currentGameMode && typeof currentGameMode.reset === 'function') {
+            currentGameMode.reset(); // Reset the mode to prepare for new questions
+            startGameMode(currentGameMode.modeName, 'en', difficultySelector.value); // Re-start with current settings
+        }
     });
 
 
@@ -116,11 +139,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelectorAll('.mode-buttons button').forEach(button => {
         button.addEventListener('click', (event) => {
             const mode = event.target.dataset.mode;
-            const lang = event.target.dataset.lang || 'en'; // Ensure a default language
+            const lang = event.target.dataset.lang || 'en'; // This is the language for the *question* if it were not always English.
+                                                             // For this feature, it's always 'en' for question clues.
             const difficulty = localStorage.getItem(DIFFICULT_LEVEL_KEY) || 'easy'; // Get current difficulty
+            const answerLang = localStorage.getItem(SELECTED_ANSWER_LANGUAGE_KEY) || 'en'; // Get selected answer language
 
-            applyLanguageClass(lang); // Apply language class when mode is selected
-            startGameMode(mode, lang, difficulty);
+            applyLanguageClass(lang); // Apply general UI language class (primarily for styling hooks)
+            startGameMode(mode, lang, difficulty, answerLang); // Pass all necessary parameters
         });
     });
 
@@ -165,10 +190,11 @@ function showModeSelection() {
 /**
  * Starts a selected game mode.
  * @param {string} mode - The identifier for the game mode (e.g., 'mixlingo').
- * @param {string} lang - The language for the game mode (e.g., 'en').
+ * @param {string} questionLang - The language for the question clues (for this feature, always 'en').
  * @param {string} difficulty - The difficulty level ('easy', 'medium', 'hard').
+ * @param {string} answerLang - The language for the answer options (e.g., 'en', 'fr', 'de').
  */
-async function startGameMode(mode, lang, difficulty) {
+async function startGameMode(mode, questionLang, difficulty, answerLang) {
     showGameContainer();
     resetAnsweredQuestionsTracker(); // Reset questions for a new game session
 
@@ -176,9 +202,12 @@ async function startGameMode(mode, lang, difficulty) {
     switch (mode) {
         case 'mixlingo':
             modeModule = mixLingo;
+            // Store current mode name for potential restart on answer language change
+            currentGameMode = { ...mixLingo, modeName: mode };
             break;
         // case 'solo':
         //     modeModule = soloMode;
+        //     currentGameMode = { ...soloMode, modeName: mode };
         //     break;
         default:
             console.error('Unknown game mode:', mode);
@@ -187,8 +216,8 @@ async function startGameMode(mode, lang, difficulty) {
     }
 
     if (modeModule && typeof modeModule.init === 'function') {
-        currentGameMode = modeModule;
-        await currentGameMode.init(lang, difficulty); // Pass language and difficulty to game mode
+        // Pass questionLang (always 'en'), difficulty, and answerLang to game mode
+        await modeModule.init(questionLang, difficulty, answerLang);
     } else {
         console.error(`Game mode module for ${mode} not found or init function missing.`);
         showModeSelection();
