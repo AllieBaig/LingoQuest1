@@ -13,6 +13,8 @@ import { initXPTracker } from './xpTracker.js';
 import { profileManager } from './profileManager.js';
 import { startGame } from './gameCore.js'; // Import startGame from the new gameCore.js
 import { initMCQAutoCheck } from './mcqAutoCheck.js'; // Assuming this is needed for game modes
+import { manualLogError } from './errorLogger.js'; // Import for manual logging (optional, but good practice)
+
 
 // Get DOM elements (now simpler, as game-specific ones are in gameCore.js)
 const soloModeBtn = document.getElementById('soloModeBtn');
