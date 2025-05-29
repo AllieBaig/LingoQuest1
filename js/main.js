@@ -1,219 +1,203 @@
 // main.js
-// Purpose: Main application entry point. Handles UI interactions, game mode switching, and core initializations.
-// Usage: Loaded by index.html as a module.
-// Timestamp: 2025-05-29 10:14:33 AM BST
+// Purpose: Entry point for the application. Initializes all modules and sets up event listeners.
+// Timestamp: 2025-05-29 06:26:00 PM BST (Updated for new profile system and app.js integration)
 // License: MIT License (https://opensource.org/licenses/MIT)
 // Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
 
-import { profileManager } from './profileManager.js';
-import { uiModeManager } from './uiModeManager.js';
+import { initUIControls } from './uiModeManager.js';
+import { initThemeToggle } from './themeManager.js';
 import { updateVersionInfo } from './version.js';
 import { initXPTracker } from './xpTracker.js';
-import { loadVocabulary, resetAnsweredQuestionsTracker } from './questionPool.js';
-import { themeManager } from './themeManager.js'; // NEW: Import themeManager
+import { profileManager } from './profileManager.js'; // Still imported to access other methods if needed
+import { loadQuestionPool } from './questionPool.js'; // Assuming this is needed for game modes
+import { initMCQAutoCheck } from './mcqAutoCheck.js'; // Assuming this is needed for game modes
 
-// Game Modes Imports
-import * as mixLingo from './modes/mixLingo.js';
-// import * as soloMode from './modes/soloMode.js'; // Corrected path - Uncomment when ready
-
-// UI Elements
+// Get DOM elements for game modes
 const gameModesSection = document.getElementById('gameModes');
 const gameContainerSection = document.getElementById('gameContainer');
-const backToModesBtn = document.getElementById('backToModesBtn');
-const uiModeSelector = document.getElementById('uiModeSelector');
-const textSizeSelector = document.getElementById('textSizeSelector');
-const darkModeToggle = document.getElementById('darkModeToggle');
-const difficultySelector = document.getElementById('difficultySelector');
+const soloModeBtn = document.getElementById('soloModeBtn');
+const mixLingoBtn = document.getElementById('mixLingoBtn');
+const wordRelicBtn = document.getElementById('wordRelicBtn');
+const wordSafariBtn = document.getElementById('wordSafariBtn');
+const sentenceClueEl = document.getElementById('sentenceClue');
+const sentenceBuilderAreaEl = document.getElementById('sentenceBuilderArea');
+const mcqOptionsEl = document.getElementById('mcqOptions');
+const resultSummaryEl = document.getElementById('resultSummary');
+
+// Language selector for answers
 const answerLanguageSelector = document.getElementById('answerLanguageSelector');
 
-// Game state
-let currentGameMode = null;
-const DIFFICULT_LEVEL_KEY = 'lingoQuestDifficulty';
-const SELECTED_LANGUAGE_KEY = 'lingoQuestSelectedLanguage';
-const SELECTED_ANSWER_LANGUAGE_KEY = 'lingoQuestSelectedAnswerLanguage';
+// Game state variables
+let currentLanguage = 'en'; // Default language, might be overridden by profile
+let currentQuestion = null;
+let currentMode = null;
+let currentAnswerLanguage = 'en'; // Language for the answers
 
-/**
- * Detects the operating system and adds a corresponding class to the body.
- */
-function detectOSAndApplyClass() {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    const body = document.body;
-
-    if (/android/i.test(userAgent)) {
-        body.classList.add('os-android');
-        console.log("OS Detected: Android");
-    } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-        body.classList.add('os-ios');
-        console.log("OS Detected: iOS");
-    } else {
-        body.classList.add('os-desktop'); // Fallback for desktop browsers
-        console.log("OS Detected: Desktop/Other");
-    }
-}
-
-
-/**
- * Applies a language class to the body based on the selected game mode language.
- * This primarily affects potential overall UI language adjustments, not answer language.
- * @param {string} langCode - The language code (e.g., 'en', 'fr', 'de').
- */
-function applyLanguageClass(langCode) {
-    const body = document.body;
-    // Remove any existing lang- classes
-    body.classList.forEach(cls => {
-        if (cls.startsWith('lang-')) {
-            body.classList.remove(cls);
-        }
-    });
-    // Add the new lang- class
-    body.classList.add(`lang-${langCode}`);
-    localStorage.setItem(SELECTED_LANGUAGE_KEY, langCode); // Save selected mode language
-    console.log(`Game mode language class applied: lang-${langCode}`);
-}
-
-
-/**
- * Initializes the application: loads profile, sets up UI, and attaches event listeners.
- */
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log("DOM Content Loaded. Initializing app...");
-
-    detectOSAndApplyClass(); // Detect OS first
-
-    // Initialize core managers
-    await profileManager.init(); // Load or create user profile
-    await themeManager.init(); // NEW: Initialize theme manager FIRST
-    uiModeManager.init(); // Apply saved UI and dark mode settings, and text size (which might override theme variables)
-    initXPTracker(); // Initialize XP bar and streak display
-    updateVersionInfo(); // Display app version
-
-    // Apply last selected game mode language class (e.g., for clue language in general UI)
-    applyLanguageClass(localStorage.getItem(SELECTED_LANGUAGE_KEY) || 'en');
-
-    // Load ALL vocabulary for dynamic question generation
-    await loadVocabulary();
-
-
-    // Set initial selector states based on loaded preferences
-    uiModeSelector.value = localStorage.getItem('lingoQuestUiMode') || 'normal';
-    textSizeSelector.value = localStorage.getItem('lingoQuestTextSize') || 'normal';
-    difficultySelector.value = localStorage.getItem(DIFFICULT_LEVEL_KEY) || 'easy'; // Set default difficulty
-
-    // Initialize Answer Language Selector
-    answerLanguageSelector.value = localStorage.getItem(SELECTED_ANSWER_LANGUAGE_KEY) || 'en'; // Default to English answers
-
-    // Event Listeners for UI controls
-    darkModeToggle.addEventListener('click', uiModeManager.toggleDarkMode);
-
-    // Event listener for UI Mode selector
-    uiModeSelector.addEventListener('change', (event) => {
-        uiModeManager.setUiMode(event.target.value);
-    });
-
-    // Event listener for Text Size selector (handled by uiModeManager now, but for sync)
-    textSizeSelector.addEventListener('change', (event) => {
-        uiModeManager.setTextSize(event.target.value);
-    });
-
-    // Event listener for Difficulty Selector
-    difficultySelector.addEventListener('change', (event) => {
-        localStorage.setItem(DIFFICULT_LEVEL_KEY, event.target.value);
-        console.log(`Difficulty set to: ${event.target.value}. Game will apply next round.`);
-    });
-
-    // Event listener for Answer Language Selector
-    answerLanguageSelector.addEventListener('change', (event) => {
-        localStorage.setItem(SELECTED_ANSWER_LANGUAGE_KEY, event.target.value);
-        console.log(`Answer language set to: ${event.target.value}. Game will apply next round.`);
-        if (currentGameMode && typeof currentGameMode.reset === 'function') {
-            currentGameMode.reset();
-            startGameMode(currentGameMode.modeName, 'en', difficultySelector.value, event.target.value);
-        }
-    });
-
-
-    // Game Mode Selection
-    document.querySelectorAll('.mode-buttons button').forEach(button => {
-        button.addEventListener('click', (event) => {
-            const mode = event.target.dataset.mode;
-            const lang = event.target.dataset.lang || 'en';
-            const difficulty = localStorage.getItem(DIFFICULT_LEVEL_KEY) || 'easy';
-            const answerLang = localStorage.getItem(SELECTED_ANSWER_LANGUAGE_KEY) || 'en';
-
-            applyLanguageClass(lang);
-            startGameMode(mode, lang, difficulty, answerLang);
-        });
-    });
-
-    // Back to Modes button listener (if implemented in HTML)
-    if (backToModesBtn) {
-        backToModesBtn.addEventListener('click', showModeSelection);
-    }
-
-    // Initial view: show game mode selection
-    showModeSelection();
-});
-
-/**
- * Hides game mode selection and shows the game container.
- */
-function showGameContainer() {
-    gameModesSection.style.display = 'none';
-    gameContainerSection.style.display = 'flex'; // Use flex for game container layout
-}
-
-/**
- * Hides game container and shows game mode selection.
- */
-function showModeSelection() {
-    gameModesSection.style.display = 'block';
-    gameContainerSection.style.display = 'none';
-    // Clear any game-specific UI elements when going back
-    document.getElementById('sentenceClue').textContent = '';
-    document.getElementById('sentenceBuilderArea').innerHTML = '';
-    document.getElementById('mcqOptions').innerHTML = '';
-    document.getElementById('resultSummary').innerHTML = '';
-
-    if (currentGameMode && typeof currentGameMode.reset === 'function') {
-        currentGameMode.reset();
-    }
-    currentGameMode = null;
-
-    // When going back to mode selection, reset language class to default or last remembered
-    applyLanguageClass(localStorage.getItem(SELECTED_LANGUAGE_KEY) || 'en');
-}
+// --- Game Logic Functions (Simplified for main.js) ---
 
 /**
  * Starts a selected game mode.
- * @param {string} mode - The identifier for the game mode (e.g., 'mixlingo').
- * @param {string} questionLang - The language for the question clues (for this feature, always 'en').
- * @param {string} difficulty - The difficulty level ('easy', 'medium', 'hard').
- * @param {string} answerLang - The language for the answer options (e.g., 'en', 'fr', 'de').
+ * @param {string} mode - The game mode to start (e.g., 'solo', 'mixlingo').
+ * @param {string} language - The primary language for the game content.
  */
-async function startGameMode(mode, questionLang, difficulty, answerLang) {
-    showGameContainer();
-    resetAnsweredQuestionsTracker();
+async function startGame(mode, language) {
+    console.log(`Starting game mode: ${mode} in language: ${language}`);
+    currentMode = mode;
+    currentLanguage = language;
+    currentAnswerLanguage = profileManager.getGameData().answerLanguage || 'en'; // Use profile's preferred answer language
 
-    let modeModule;
-    switch (mode) {
-        case 'mixlingo':
-            modeModule = mixLingo;
-            currentGameMode = { ...mixLingo, modeName: mode };
-            break;
-        // case 'solo':
-        //     modeModule = soloMode;
-        //     currentGameMode = { ...soloMode, modeName: mode };
-        //     break;
-        default:
-            console.error('Unknown game mode:', mode);
-            showModeSelection();
-            return;
-    }
+    gameModesSection.style.display = 'none';
+    gameContainerSection.style.display = 'flex'; // Show game container
 
-    if (modeModule && typeof modeModule.init === 'function') {
-        await modeModule.init(questionLang, difficulty, answerLang);
+    // Load questions for the selected language/difficulty
+    const difficulty = profileManager.getGameData().difficulty;
+    const questions = await loadQuestionPool(currentLanguage, difficulty);
+    if (questions && questions.length > 0) {
+        console.log(`Loaded ${questions.length} questions for ${currentLanguage} (${difficulty} difficulty).`);
+        // For demonstration, let's just pick a random question
+        currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+        displayQuestion(currentQuestion);
     } else {
-        console.error(`Game mode module for ${mode} not found or init function missing.`);
-        showModeSelection();
+        sentenceClueEl.textContent = 'No questions available for this mode/language/difficulty.';
+        mcqOptionsEl.innerHTML = '';
+        console.warn('No questions loaded!');
     }
 }
+
+/**
+ * Displays the current question on the UI.
+ * @param {object} question - The question object to display.
+ */
+function displayQuestion(question) {
+    if (!question) {
+        sentenceClueEl.textContent = 'Error: No question to display.';
+        mcqOptionsEl.innerHTML = '';
+        return;
+    }
+
+    // Clear previous results and areas
+    resultSummaryEl.innerHTML = '';
+    resultSummaryEl.style.display = 'none';
+    sentenceBuilderAreaEl.innerHTML = ''; // For sentence building games
+    sentenceBuilderAreaEl.style.display = 'none'; // Hide if not a sentence builder game
+
+    sentenceClueEl.textContent = question.clue;
+    sentenceClueEl.style.display = 'block';
+
+    // Handle MCQ options
+    if (question.options && question.options.length > 0) {
+        mcqOptionsEl.innerHTML = '';
+        mcqOptionsEl.style.display = 'grid'; // Show MCQ options
+        question.options.forEach(option => {
+            const button = document.createElement('button');
+            button.className = 'mcq-option';
+            button.textContent = option[currentAnswerLanguage]; // Display option in preferred answer language
+            button.dataset.value = option.en; // Store English value for checking
+            button.addEventListener('click', () => handleMCQSelection(button, option));
+            mcqOptionsEl.appendChild(button);
+        });
+    } else {
+        mcqOptionsEl.innerHTML = 'No options for this question type.';
+        mcqOptionsEl.style.display = 'none';
+    }
+}
+
+/**
+ * Handles MCQ option selection.
+ * @param {HTMLButtonElement} selectedButton - The button element that was clicked.
+ * @param {object} selectedOption - The selected option object.
+ */
+function handleMCQSelection(selectedButton, selectedOption) {
+    const allOptions = Array.from(mcqOptionsEl.children);
+    const correctAnswer = currentQuestion.answer.en; // Assuming English is the canonical answer
+
+    // Disable all options to prevent multiple selections
+    allOptions.forEach(btn => btn.disabled = true);
+
+    if (selectedOption.en === correctAnswer) {
+        selectedButton.classList.add('correct');
+        resultSummaryEl.textContent = 'Correct!';
+        profileManager.addXP(10); // Add XP for correct answer
+        profileManager.incrementStreak(); // Increment streak
+    } else {
+        selectedButton.classList.add('incorrect');
+        resultSummaryEl.textContent = `Incorrect. The correct answer was: ${currentQuestion.answer[currentAnswerLanguage] || currentQuestion.answer.en}`;
+        profileManager.resetStreak(); // Reset streak for incorrect answer
+    }
+
+    resultSummaryEl.style.display = 'flex'; // Show result summary
+
+    // Add a "Next Question" button
+    const nextButton = document.createElement('button');
+    nextButton.textContent = 'Next Question';
+    nextButton.addEventListener('click', () => {
+        // Just reload a new random question for simplicity
+        startGame(currentMode, currentLanguage);
+    });
+    resultSummaryEl.appendChild(nextButton);
+}
+
+// --- Event Listeners and Initializations ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    // These initializations rely on app.js having set up window.profileID and profileManager.
+    // They are called after DOMContentLoded to ensure all HTML elements are available.
+
+    // Initialize UI controls (theme, text size, etc.) based on profile settings
+    // profileManager.getGameData() is now guaranteed to have initial data from app.js
+    const initialGameData = profileManager.getGameData();
+
+    // Initialize UI mode (normal/ascii)
+    initUIControls(initialGameData.uiMode);
+    document.getElementById('uiModeSelector').value = initialGameData.uiMode;
+    document.getElementById('uiModeSelector').addEventListener('change', (e) => {
+        initUIControls(e.target.value);
+        profileManager.updateSetting('uiMode', e.target.value);
+    });
+
+    // Initialize text size (normal, senior-big, senior-very-big)
+    initUIControls(initialGameData.textSize); // Re-use initUIControls for text size classes
+    document.getElementById('textSizeSelector').value = initialGameData.textSize;
+    document.getElementById('textSizeSelector').addEventListener('change', (e) => {
+        initUIControls(e.target.value);
+        profileManager.updateSetting('textSize', e.target.value);
+    });
+
+    // Initialize dark mode
+    initThemeToggle(initialGameData.darkMode); // Pass initial dark mode state
+    document.getElementById('darkModeToggle').addEventListener('click', () => {
+        const newDarkModeState = !document.body.classList.contains('dark');
+        initThemeToggle(newDarkModeState);
+        profileManager.updateSetting('darkMode', newDarkModeState);
+    });
+
+    // Initialize difficulty selector
+    document.getElementById('difficultySelector').value = initialGameData.difficulty;
+    document.getElementById('difficultySelector').addEventListener('change', (e) => {
+        profileManager.updateSetting('difficulty', e.target.value);
+    });
+
+    // Initialize answer language selector
+    answerLanguageSelector.value = initialGameData.answerLanguage;
+    answerLanguageSelector.addEventListener('change', (e) => {
+        currentAnswerLanguage = e.target.value;
+        profileManager.updateSetting('answerLanguage', e.target.value);
+    });
+
+    // Initialize XP Tracker UI
+    initXPTracker();
+
+    // Update version info in footer
+    updateVersionInfo();
+
+    // Event listeners for game mode buttons
+    soloModeBtn.addEventListener('click', () => startGame('solo', soloModeBtn.dataset.lang));
+    mixLingoBtn.addEventListener('click', () => startGame('mixlingo', mixLingoBtn.dataset.lang));
+    wordRelicBtn.addEventListener('click', () => alert('Word Relic mode not yet implemented!')); // Placeholder
+    wordSafariBtn.addEventListener('click', () => alert('Word Safari mode not yet implemented!')); // Placeholder
+
+    // Initialize MCQ auto-check (if it needs initial setup, otherwise it handles events internally)
+    initMCQAutoCheck(); // This function likely just attaches its own event listeners
+
+    console.log('[main.js] All UI and game modules initialized.');
+});
