@@ -1,7 +1,8 @@
+
 // uiModeManager.js
 // Purpose: Manages UI themes (light/dark mode) and UI styles (normal/ASCII) and text sizing.
 // Usage: Imported by main.js.
-// Timestamp: 2025-05-29 03:09 AM BST
+// Timestamp: 2025-05-29 09:44:00 AM BST
 // License: MIT License (https://opensource.org/licenses/MIT)
 // Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
 
@@ -18,7 +19,7 @@ export const uiModeManager = {
         this._applyUiMode(this._getPreferredUiMode());
         this._applyTextSize(this._getPreferredTextSize()); // Apply text size on init
 
-        // Event listener for Text Size selector (NEW)
+        // Event listener for Text Size selector
         const textSizeSelector = document.getElementById('textSizeSelector');
         if (textSizeSelector) {
             textSizeSelector.addEventListener('change', (event) => {
@@ -31,8 +32,10 @@ export const uiModeManager = {
      * Toggles dark mode on or off.
      */
     toggleDarkMode() {
-        const isDark = document.body.classList.toggle('dark');
+        const isDark = !document.body.classList.contains('dark'); // Determine new state
+        document.body.classList.toggle('dark', isDark); // Apply/remove class
         localStorage.setItem(DARK_MODE_KEY, isDark ? 'true' : 'false');
+        this._updateDarkModeIcon(isDark); // Update icon
     },
 
     /**
@@ -61,7 +64,7 @@ export const uiModeManager = {
     },
 
     /**
-     * Sets the text size theme (e.g., 'normal', 'senior-big', 'senior-very-big'). (NEW FUNCTION)
+     * Sets the text size theme (e.g., 'normal', 'senior-big', 'senior-very-big').
      * @param {string} sizeClass - The class to apply for text size.
      */
     setTextSize(sizeClass) {
@@ -105,7 +108,7 @@ export const uiModeManager = {
     },
 
     /**
-     * Gets the preferred text size setting from localStorage. (NEW FUNCTION)
+     * Gets the preferred text size setting from localStorage.
      * Defaults to 'normal' if not set.
      * @returns {string} The preferred text size class.
      */
@@ -114,7 +117,7 @@ export const uiModeManager = {
     },
 
     /**
-     * Applies the dark mode class to the body.
+     * Applies the dark mode class to the body and updates the icon.
      * @param {boolean} isDark - True to apply dark mode, false to remove.
      */
     _applyDarkMode(isDark) {
@@ -122,6 +125,24 @@ export const uiModeManager = {
             document.body.classList.add('dark');
         } else {
             document.body.classList.remove('dark');
+        }
+        this._updateDarkModeIcon(isDark); // Update icon on initial load
+    },
+
+    /**
+     * Updates the dark mode icon based on the current dark mode state. (NEW PRIVATE METHOD)
+     * @param {boolean} isDark - True if dark mode is active, false otherwise.
+     */
+    _updateDarkModeIcon(isDark) {
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        if (darkModeToggle) {
+            if (isDark) {
+                darkModeToggle.classList.remove('fa-moon');
+                darkModeToggle.classList.add('fa-sun');
+            } else {
+                darkModeToggle.classList.remove('fa-sun');
+                darkModeToggle.classList.add('fa-moon');
+            }
         }
     },
 
@@ -149,7 +170,7 @@ export const uiModeManager = {
     },
 
     /**
-     * Applies the text size class to the body. (NEW FUNCTION)
+     * Applies the text size class to the body.
      * @param {string} sizeClass - The text size class to apply.
      */
     _applyTextSize(sizeClass) {
@@ -167,4 +188,3 @@ export const uiModeManager = {
         }
     }
 };
-
