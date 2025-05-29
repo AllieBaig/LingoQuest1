@@ -1,21 +1,85 @@
-
-
 /*
  * style.css
- * Purpose: Main styling for LingoQuestPWA, normal UI mode.
+ * Purpose: Main styling for LingoQuestPWA, normal UI mode, with senior-friendly scaling.
  * Usage: Linked in index.html.
- * Timestamp: 2025-05-28
+ * Timestamp: 2025-05-29 03:04 AM BST
  * License: MIT License (https://opensource.org/licenses/MIT)
+ * Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
  */
 
 :root {
-    /* ... existing CSS variables ... */
+    /* Color Variables */
+    --primary-color: #4CAF50; /* Green */
+    --secondary-color: #2196F3; /* Blue */
+    --background-color: #f4f4f4;
+    --text-color: #333;
+    --border-color: #ddd;
+    --card-background: #fff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+
+    /* Base Sizing Variables (Adjust these defaults for overall feel) */
+    --base-font-scale: 1; /* Multiplier for base font size */
+    --base-padding-scale: 1; /* Multiplier for base padding */
+    --base-button-min-height: 48px; /* Minimum height for buttons */
+
+    /* Font Sizes (Using clamp for responsiveness + scaling factor) */
+    --font-size-body: clamp(16px, calc(1rem * var(--base-font-scale) + 0.5vw), 20px);
+    --font-size-h1: clamp(28px, calc(2.2em * var(--base-font-scale) + 1vw), 50px);
+    --font-size-h2: clamp(22px, calc(1.8em * var(--base-font-scale) + 0.5vw), 36px);
+    --font-size-game-clue: clamp(24px, calc(1.5em * var(--base-font-scale) + 0.8vw), 40px);
+    --font-size-mcq-option: clamp(18px, calc(1.1em * var(--base-font-scale) + 0.3vw), 28px);
+    --font-size-footer: clamp(14px, calc(0.9em * var(--base-font-scale)), 18px);
+
+    /* Padding Sizes */
+    --padding-sm: calc(10px * var(--base-padding-scale));
+    --padding-md: calc(15px * var(--base-padding-scale));
+    --padding-lg: calc(20px * var(--base-padding-scale));
+    --padding-xl: calc(25px * var(--base-padding-scale));
 }
 
+/* --- Dark Mode Theme --- */
 body.dark {
-    /* ... existing dark mode variables ... */
+    --primary-color: #66BB6A;
+    --secondary-color: #90CAF9;
+    --background-color: #2c2c2c;
+    --text-color: #f4f4f4;
+    --border-color: #555;
+    --card-background: #3a3a3a;
+    --shadow-color: rgba(0, 0, 0, 0.3);
 }
 
+/* --- Senior-Friendly "Big" Theme --- */
+body.senior-big {
+    --base-font-scale: 1.2; /* 20% larger fonts */
+    --base-padding-scale: 1.2; /* 20% larger padding */
+    --base-button-min-height: 55px; /* Taller buttons */
+
+    /* Override max values if desired, or let clamp handle it */
+    --font-size-body: clamp(18px, calc(1rem * var(--base-font-scale) + 0.6vw), 24px);
+    --font-size-h1: clamp(32px, calc(2.5em * var(--base-font-scale) + 1.2vw), 60px);
+    --font-size-h2: clamp(26px, calc(2em * var(--base-font-scale) + 0.7vw), 42px);
+    --font-size-game-clue: clamp(28px, calc(1.8em * var(--base-font-scale) + 1vw), 48px);
+    --font-size-mcq-option: clamp(20px, calc(1.2em * var(--base-font-scale) + 0.4vw), 32px);
+    --font-size-footer: clamp(16px, calc(1em * var(--base-font-scale)), 20px);
+}
+
+/* --- Senior-Friendly "Very Big" Theme --- */
+body.senior-very-big {
+    --base-font-scale: 1.4; /* 40% larger fonts */
+    --base-padding-scale: 1.4; /* 40% larger padding */
+    --base-button-min-height: 65px; /* Even taller buttons */
+
+    /* Override max values further */
+    --font-size-body: clamp(20px, calc(1.1rem * var(--base-font-scale) + 0.7vw), 28px);
+    --font-size-h1: clamp(36px, calc(2.8em * var(--base-font-scale) + 1.5vw), 70px);
+    --font-size-h2: clamp(30px, calc(2.2em * var(--base-font-scale) + 0.8vw), 48px);
+    --font-size-game-clue: clamp(32px, calc(2em * var(--base-font-scale) + 1.2vw), 56px);
+    --font-size-mcq-option: clamp(22px, calc(1.3em * var(--base-font-scale) + 0.5vw), 36px);
+    --font-size-footer: clamp(18px, calc(1.1em * var(--base-font-scale)), 22px);
+}
+
+
+/* --- General Body and Layout --- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
@@ -26,62 +90,267 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-
-    /* --- Dynamic Font Scaling for Body Text --- */
-    /*
-     * min-size: 16px (on very small screens)
-     * preferred-size: 1rem + 0.5vw (scales with viewport width)
-     * max-size: 19px (on very large screens)
-     */
-    font-size: clamp(16px, 1rem + 0.5vw, 19px);
+    font-size: var(--font-size-body); /* Use the new variable */
 }
 
 body.minimal-ui {
-    /* ... existing minimal-ui styles ... */
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 0 15px var(--shadow-color);
+    min-height: 100vh;
+    padding: var(--padding-lg); /* Use variable */
 }
 
 header {
-    /* ... existing header styles ... */
+    background-color: var(--primary-color);
+    color: white;
+    padding: var(--padding-lg); /* Use variable */
+    text-align: center;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--padding-sm); /* Use variable */
 }
 
 header h1 {
     margin: 0;
-    /* --- Dynamic Font Scaling for H1 --- */
-    /*
-     * min-size: 1.8em (on very small screens, e.g., 28.8px if root is 16px)
-     * preferred-size: 2.2em + 1vw (scales with viewport width)
-     * max-size: 3.5em (on very large screens, e.g., 56px if root is 16px)
-     */
-    font-size: clamp(1.8em, 2.2em + 1vw, 3.5em);
+    font-size: var(--font-size-h1); /* Use the new variable */
 }
 
-/* ... other existing styles ... */
+.header-controls {
+    display: flex;
+    gap: var(--padding-sm); /* Use variable */
+    flex-wrap: wrap;
+}
 
-section h2 {
-    /* --- Dynamic Font Scaling for H2 (e.g., "Select a Game Mode") --- */
-    font-size: clamp(1.3em, 1.8em + 0.5vw, 2.5em);
+select, button {
+    padding: var(--padding-sm) var(--padding-md); /* Use variables */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: var(--font-size-body); /* Buttons use body font size */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    background-color: var(--secondary-color);
+    color: white;
+    min-height: var(--base-button-min-height); /* Set min height for big buttons */
+}
+
+select {
+    background-color: var(--card-background);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+button:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+main {
+    flex-grow: 1;
+    padding: var(--padding-lg) 0; /* Use variable */
+    display: flex;
+    flex-direction: column;
+    gap: var(--padding-lg); /* Use variable */
+}
+
+section {
+    background-color: var(--card-background);
+    padding: var(--padding-xl); /* Use variable */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+#gameModes {
+    text-align: center;
+}
+
+.mode-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--padding-md); /* Use variable */
+    margin-top: var(--padding-lg); /* Use variable */
+}
+
+.mode-buttons button {
+    background-color: var(--primary-color);
+    font-weight: bold;
+    font-size: var(--font-size-mcq-option); /* Make mode buttons bigger */
+}
+
+#gameContainer {
+    display: none; /* Hidden by default, shown when a game mode is selected */
+    flex-direction: column;
+    gap: var(--padding-lg); /* Use variable */
+    align-items: center;
+}
+
+.game-area {
+    width: 100%;
+    max-width: 700px;
+    min-height: 50px;
+    padding: var(--padding-md); /* Use variable */
+    border: 1px dashed var(--border-color);
+    border-radius: 5px;
+    text-align: center;
+}
+
+#xpTracker {
+    display: flex;
+    align-items: center;
+    gap: var(--padding-md); /* Use variable */
+    margin-bottom: var(--padding-lg); /* Use variable */
+    padding: var(--padding-sm) var(--padding-md); /* Use variables */
+    background-color: var(--card-background);
+    border-radius: 5px;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.xp-bar {
+    flex-grow: 1;
+    height: 15px; /* Fixed height for progress bar */
+    background-color: #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+body.dark .xp-bar {
+    background-color: #555;
+}
+
+.xp-fill {
+    height: 100%;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    transition: width 0.5s ease-out;
+}
+
+.xp-text, .streak-badge {
+    font-weight: bold;
+    color: var(--text-color);
+    font-size: var(--font-size-body); /* Use body font size */
 }
 
 #sentenceClue {
-    /* ... existing styles ... */
-    /* --- Dynamic Font Scaling for Clue Text --- */
-    font-size: clamp(1.3em, 1.5em + 0.8vw, 2.2em);
+    font-size: var(--font-size-game-clue); /* Use variable */
     font-weight: bold;
-    min-height: 80px;
+    min-height: 80px; /* Might need adjustment based on font size */
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: var(--background-color);
 }
 
-/* ... rest of your CSS ... */
+#sentenceBuilderArea {
+    min-height: 100px; /* Might need adjustment based on font size */
+    background-color: var(--background-color);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--padding-sm); /* Use variable */
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--border-color);
+}
+
+#mcqOptions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--padding-sm); /* Use variable */
+    padding: var(--padding-md); /* Use variable */
+    min-height: 80px; /* Might need adjustment based on font size */
+}
+
+.mcq-option {
+    padding: var(--padding-md); /* Use variable */
+    background-color: var(--secondary-color);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-weight: bold;
+    text-align: center;
+    font-size: var(--font-size-mcq-option); /* Use variable */
+    min-height: var(--base-button-min-height); /* Make MCQ options bigger */
+    display: flex; /* For centering text vertically */
+    justify-content: center;
+    align-items: center;
+}
+
+.mcq-option:hover {
+    filter: brightness(1.15);
+}
+
+.mcq-option.correct {
+    background-color: var(--primary-color);
+}
+
+.mcq-option.incorrect {
+    background-color: #E57373; /* Red for incorrect */
+}
+
+#resultSummary {
+    min-height: 80px;
+    font-size: var(--font-size-game-clue); /* Use game clue font size for result */
+    font-weight: bold;
+    display: flex;
+    flex-direction: column; /* Allow next button to stack */
+    justify-content: center;
+    align-items: center;
+    gap: var(--padding-sm);
+}
+
+#resultSummary button {
+    margin-top: var(--padding-md);
+    font-size: var(--font-size-body);
+    padding: var(--padding-sm) var(--padding-lg);
+}
+
+
+footer {
+    margin-top: auto;
+    background-color: var(--primary-color);
+    color: white;
+    text-align: center;
+    padding: var(--padding-md); /* Use variable */
+    border-radius: 0 0 8px 8px;
+    font-size: var(--font-size-footer); /* Use variable */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--padding-sm); /* Use variable */
+}
+
+#versionInfo {
+    font-size: var(--font-size-footer); /* Use variable */
+    opacity: 0.8;
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    /* Existing media query rules... */
-    /*
-       For font scaling using clamp(), you generally don't need
-       separate font-size rules in media queries unless you want
-       a very specific behavior override. clamp() handles the range automatically.
-    */
+    header {
+        flex-direction: column;
+    }
+
+    .header-controls {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .mode-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    body.minimal-ui {
+        padding: var(--padding-sm); /* Use variable for smaller padding on mobile */
+    }
+
+    section {
+        padding: var(--padding-md); /* Use variable */
+    }
 }
+
