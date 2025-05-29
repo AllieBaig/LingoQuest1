@@ -1,16 +1,17 @@
-// main.js
-// Purpose: Entry point for the application. Initializes all modules and sets up event listeners.
-// Timestamp: 2025-05-29 06:26:00 PM BST (Updated for new profile system and app.js integration)
 // License: MIT License (https://opensource.org/licenses/MIT)
 // Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
 
+// main.js
+// Purpose: Entry point for the application. Initializes all modules and sets up event listeners.
+// Timestamp: 2025-05-29 07:31:00 PM BST (Updated for new profile system and app.js integration)
+
 import { initUIControls } from './uiModeManager.js';
-import { initThemeToggle } from './themeManager.js';
+import { applyTheme, initThemeToggle, getAvailableCustomThemes } from './themeManager.js'; // Import applyTheme and getAvailableCustomThemes
 import { updateVersionInfo } from './version.js';
 import { initXPTracker } from './xpTracker.js';
-import { profileManager } from './profileManager.js'; // Still imported to access other methods if needed
-import { loadQuestionPool } from './questionPool.js'; // Assuming this is needed for game modes
-import { initMCQAutoCheck } from './mcqAutoCheck.js'; // Assuming this is needed for game modes
+import { profileManager } from './profileManager.js';
+import { loadQuestionPool } from './questionPool.js';
+import { initMCQAutoCheck } from './mcqAutoCheck.js';
 
 // Get DOM elements for game modes
 const gameModesSection = document.getElementById('gameModes');
@@ -26,6 +27,9 @@ const resultSummaryEl = document.getElementById('resultSummary');
 
 // Language selector for answers
 const answerLanguageSelector = document.getElementById('answerLanguageSelector');
+
+// Theme selector
+const themeSelector = document.getElementById('themeSelector');
 
 // Game state variables
 let currentLanguage = 'en'; // Default language, might be overridden by profile
@@ -143,8 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // These initializations rely on app.js having set up window.profileID and profileManager.
     // They are called after DOMContentLoded to ensure all HTML elements are available.
 
-    // Initialize UI controls (theme, text size, etc.) based on profile settings
-    // profileManager.getGameData() is now guaranteed to have initial data from app.js
     const initialGameData = profileManager.getGameData();
 
     // Initialize UI mode (normal/ascii)
@@ -183,6 +185,38 @@ document.addEventListener('DOMContentLoaded', () => {
         currentAnswerLanguage = e.target.value;
         profileManager.updateSetting('answerLanguage', e.target.value);
     });
+
+    // --- Theme Selector Initialization and Event Listener ---
+    // Populate the theme selector dropdown
+    const availableThemes = getAvailableCustomThemes();
+    availableThemes.forEach(theme => {
+        const option = document.createElement('option');
+        option.value = theme.id;
+        option.textContent = theme.name;
+        themeSelector.appendChild(option);
+    });
+
+    // Set the initial value of the theme selector based on profile data
+    // Note: app.js already applied the theme (including specific-day/random overrides)
+    // Here we just set the dropdown to reflect what's active in the profile.
+    // If a specific day theme is active, the dropdown might not match,
+    // which is fine, as specific day themes are overriding.
+    const savedThemePreference = initialGameData.currentTheme || 'default';
+    themeSelector.value = savedThemePreference;
+
+    // Add event listener for theme selection change
+    themeSelector.addEventListener('change', (e) => {
+        const selectedThemeId = e.target.value;
+        profileManager.updateSetting('currentTheme', selectedThemeId); // Save user's preference
+        // app.js handles the actual application of the theme on load.
+        // For immediate visual update here, we also call applyTheme.
+        // app.js will still re-evaluate on next load, applying specific day theme if applicable.
+        const currentDarkModeState = document.body.classList.contains('dark'); // Keep current dark mode state
+        applyTheme(selectedThemeId, currentDarkModeState);
+        console.log(`[main.js] User selected theme: ${selectedThemeId}. Applied immediately.`);
+    });
+    // --- End Theme Selector ---
+
 
     // Initialize XP Tracker UI
     initXPTracker();
