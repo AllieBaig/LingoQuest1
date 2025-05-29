@@ -10,10 +10,10 @@
  */
 
 /* Import order matters! Variables should come first. */
-@import url('css/modules/_variables.css');
-@import url('css/modules/_base.css');
-@import url('css/modules/_themes.css');
-@import url('css/modules/_header.css');
+@import url('/modules/_variables.css');
+@import url('/modules/_base.css');
+@import url('/modules/_themes.css');
+@import url('/modules/_header.css');
 @import url('css/modules/_layout.css');
 @import url('css/modules/_components.css');
 @import url('css/modules/_game_elements.css');
