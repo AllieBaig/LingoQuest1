@@ -4,7 +4,7 @@
 // Timestamp: 2025-05-28 10:31 PM BST
 // License: MIT License (https://opensource.org/licenses/MIT)
 
-import { v4 as uuidv4 } from './lib/uuid.min.js'; // Assuming uuid.min.js is available or polyfilled
+import { v4 as uuidv4 } from './js/lib/uuid.min.js'; // Assuming uuid.min.js is available or polyfilled
 
 const PROFILE_KEY = 'lingoQuestProfile';
 
