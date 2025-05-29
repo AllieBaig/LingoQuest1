@@ -34,6 +34,22 @@ const DIFFICULT_LEVEL_KEY = 'lingoQuestDifficulty'; // localStorage key for diff
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("DOM Content Loaded. Initializing app...");
 
+    const mixLingoBtn = document.getElementById('mixLingoBtn');
+
+if (mixLingoBtn) {
+    mixLingoBtn.addEventListener('click', () => {
+        const mode = mixLingoBtn.dataset.mode || 'mixlingo';
+        const lang = mixLingoBtn.dataset.lang || 'en';
+        const difficulty = localStorage.getItem('lingoQuestDifficulty') || 'easy';
+
+        console.log(`🎮 MixLingo clicked: mode=${mode}, lang=${lang}, difficulty=${difficulty}`);
+        startGameMode(mode, lang, difficulty);
+    });
+} else {
+    console.warn("⚠️ mixLingoBtn not found in DOM.");
+}
+    
+
     // Initialize core managers
     await profileManager.init(); // Load or create user profile
     uiModeManager.init(); // Apply saved UI and dark mode settings, and text size
