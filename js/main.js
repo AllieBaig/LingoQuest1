@@ -23,6 +23,35 @@ const wordSafariBtn = document.getElementById('wordSafariBtn');
 const answerLanguageSelector = document.getElementById('answerLanguageSelector');
 const difficultySelector = document.getElementById('difficultySelector');
 
+// Simple static theme switcher (no themeManager involved)
+const themeSelector = document.getElementById('themeSelector');
+if (themeSelector) {
+    themeSelector.addEventListener('change', (e) => {
+        const selected = e.target.value;
+
+        // Disable all custom themes
+        document.getElementById('theme-christmas')?.setAttribute('disabled', true);
+        document.getElementById('theme-ascii-pure')?.setAttribute('disabled', true);
+
+        // Remove all theme-related body classes
+        document.body.classList.remove('ascii-ui', 'christmas', 'pure');
+
+        // Apply static themes directly
+        if (selected === 'christmas-theme') {
+            document.getElementById('theme-christmas')?.removeAttribute('disabled');
+            document.body.classList.add('ascii-ui', 'christmas');
+        } else if (selected === 'ascii-pure') {
+            document.getElementById('theme-ascii-pure')?.removeAttribute('disabled');
+            document.body.classList.add('ascii-ui', 'pure');
+        }
+
+        // Save selection to localStorage (optional)
+        localStorage.setItem('appTheme', selected);
+        console.log(`[main.js] Static theme applied: ${selected}`);
+    });
+} else {
+    console.warn('[main.js] Theme selector not found.');
+}
 
 // Add a check to see if buttons are found for debugging startup
 console.log('[main.js] DOM element checks:');
