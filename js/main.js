@@ -4,147 +4,147 @@
 // main.js
 // Purpose: Entry point for the application. Initializes UI controls, XP tracker,
 // and sets up event listeners for game mode selection.
-// Timestamp: 2025-05-30 03:41:50 AM BST (Adjusted for standalone themeManager)
+// Timestamp: 2025-05-30 05:25:00 AM BST (Logging events to eventLogger.js)
 
-console.log('[main.js] FILE LOADED AND EXECUTING TOP LEVEL CODE.');
-
+// CHANGED: Import logEvent from eventLogger.js
+import { logEvent } from './eventLogger.js';
 import { initUIControls } from './uiModeManager.js';
-// REMOVE THEME MANAGER IMPORTS, as it's now standalone and self-initializing
-// import { applyTheme, initThemeToggle, getAvailableCustomThemes } from './themeManager.js';
 import { updateVersionInfo } from './version.js';
-// COMMENT OUT XP TRACKER FOR NOW IF IT RELIES HEAVILY ON PROFILE
-// import { initXPTracker } from './xpTracker.js';
-// COMMENT OUT PROFILE MANAGER IMPORT
-// import { profileManager } from './profileManager.js';
 import { startGame } from './gameCore.js';
-//import { initMCQAutoCheck } from './mcqAutoCheck.js';
-import { manualLogError } from './errorLogger.js';
 
 // Get DOM elements
 const soloModeBtn = document.getElementById('soloModeBtn');
 const mixLingoBtn = document.getElementById('mixLingoBtn');
 const wordRelicBtn = document.getElementById('wordRelicBtn');
 const wordSafariBtn = document.getElementById('wordSafariBtn');
-
-// Add a check to see if buttons are found
-console.log('soloModeBtn:', soloModeBtn);
-console.log('mixLingoBtn:', mixLingoBtn);
-console.log('wordRelicBtn:', wordRelicBtn);
-console.log('wordSafariBtn:', wordSafariBtn);
-
-
-// Language selector for answers
 const answerLanguageSelector = document.getElementById('answerLanguageSelector');
+const difficultySelector = document.getElementById('difficultySelector');
+const uiModeSelector = document.getElementById('uiModeSelector');
+const textSizeSelector = document.getElementById('textSizeSelector');
 
-// Theme selector - This element is now handled by themeManager.js directly
-const themeSelector = document.getElementById('themeSelector'); // Still get reference if needed for other purposes, but not setup here.
+
+// Add a check to see if buttons are found for debugging startup
+// These can remain as console.log for initial application load diagnostics
+console.log('[main.js] DOM element checks:');
+console.log(`  soloModeBtn found: ${!!soloModeBtn}`);
+console.log(`  mixLingoBtn found: ${!!mixLingoBtn}`);
+console.log(`  wordRelicBtn found: ${!!wordRelicBtn}`);
+console.log(`  wordSafariBtn found: ${!!wordSafariBtn}`);
+console.log(`  answerLanguageSelector found: ${!!answerLanguageSelector}`);
+console.log(`  difficultySelector found: ${!!difficultySelector}`);
+console.log(`  uiModeSelector found: ${!!uiModeSelector}`);
+console.log(`  textSizeSelector found: ${!!textSizeSelector}`);
+
 
 // --- Event Listeners and Initializations ---
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('[main.js] DOMContent loaded. Initializing UI and game listeners.');
-    // COMMENT OUT PROFILE-RELATED DATA FETCH
-    // const initialGameData = profileManager.getGameData();
+    logEvent('[main.js] DOMContent loaded. Initializing UI and game listeners.', 'info'); // Event log
 
-    // Use default/fallback values since profile is disabled (and theme data is handled by themeManager now)
     const initialGameData = {
         uiMode: 'normal',
         textSize: 'normal',
-        // darkMode: false, // Handled by themeManager
         difficulty: 'easy',
         answerLanguage: 'en',
-        // currentTheme: 'default' // Handled by themeManager
     };
 
-    // Initialize UI mode (normal/ascii)
+    // Initialize UI mode (normal/ascii) and attach listener with log
     initUIControls(initialGameData.uiMode);
-    document.getElementById('uiModeSelector').value = initialGameData.uiMode;
-    document.getElementById('uiModeSelector').addEventListener('change', (e) => {
-        initUIControls(e.target.value);
-        // profileManager.updateSetting('uiMode', e.target.value); // COMMENT OUT
-    });
+    if (uiModeSelector) {
+        uiModeSelector.value = initialGameData.uiMode;
+        uiModeSelector.addEventListener('change', (e) => {
+            const selectedMode = e.target.value;
+            logEvent(`UI Mode changed to: ${selectedMode}`, 'change', { uiMode: selectedMode }); // Event log
+            initUIControls(selectedMode);
+        });
+    } else {
+        console.warn('[main.js] UI Mode Selector not found.');
+    }
 
-    // Initialize text size (normal, senior-big, senior-very-big)
+    // Initialize text size and attach listener with log
     initUIControls(initialGameData.textSize);
-    document.getElementById('textSizeSelector').value = initialGameData.textSize;
-    document.getElementById('textSizeSelector').addEventListener('change', (e) => {
-        initUIControls(e.target.value);
-        // profileManager.updateSetting('textSize', e.target.value); // COMMENT OUT
-    });
+    if (textSizeSelector) {
+        textSizeSelector.value = initialGameData.textSize;
+        textSizeSelector.addEventListener('change', (e) => {
+            const selectedSize = e.target.value;
+            logEvent(`Text Size changed to: ${selectedSize}`, 'change', { textSize: selectedSize }); // Event log
+            initUIControls(selectedSize);
+        });
+    } else {
+        console.warn('[main.js] Text Size Selector not found.');
+    }
 
-    // Initialize dark mode (This toggle's event listener is now handled by themeManager.js)
-    // We only need to ensure the element exists.
-    // document.getElementById('darkModeToggle').addEventListener('click', () => {
-    //     const newDarkModeState = !document.body.classList.contains('dark');
-    //     initThemeToggle(newDarkModeState); // This now comes from themeManager itself.
-    //     // profileManager.updateSetting('darkMode', newDarkModeState); // COMMENT OUT
-    // });
+    // Initialize difficulty selector and attach listener with log
+    if (difficultySelector) {
+        difficultySelector.value = initialGameData.difficulty;
+        difficultySelector.addEventListener('change', (e) => {
+            const selectedDifficulty = e.target.value;
+            logEvent(`Difficulty changed to: ${selectedDifficulty}`, 'change', { difficulty: selectedDifficulty }); // Event log
+        });
+    } else {
+        console.warn('[main.js] Difficulty Selector not found.');
+    }
 
-    // Initialize difficulty selector
-    document.getElementById('difficultySelector').value = initialGameData.difficulty;
-    document.getElementById('difficultySelector').addEventListener('change', (e) => {
-        // profileManager.updateSetting('difficulty', e.target.value); // COMMENT OUT
-    });
+    // Initialize answer language selector and attach listener with log
+    if (answerLanguageSelector) {
+        answerLanguageSelector.value = initialGameData.answerLanguage;
+        answerLanguageSelector.addEventListener('change', (e) => {
+            const selectedLang = e.target.value;
+            logEvent(`Answer Language changed to: ${selectedLang}`, 'change', { answerLanguage: selectedLang }); // Event log
+        });
+    } else {
+        console.warn('[main.js] Answer Language Selector not found.');
+    }
 
-    // Initialize answer language selector
-    answerLanguageSelector.value = initialGameData.answerLanguage;
-    answerLanguageSelector.addEventListener('change', (e) => {
-        // profileManager.updateSetting('answerLanguage', e.target.value); // COMMENT OUT
-    });
+    logEvent('[main.js] Theme selector logic delegated to standalone themeManager.js.', 'info'); // Event log
+    
+    const xpTextEl = document.querySelector('.xp-text');
+    const xpFillEl = document.querySelector('.xp-fill');
+    const streakBadgeEl = document.querySelector('.streak-badge');
 
-    // --- Theme Selector Initialization and Event Listener ---
-    // ALL THIS IS NOW HANDLED BY THE STANDALONE themeManager.js
-    // const availableThemes = getAvailableCustomThemes();
-    // themeSelector.innerHTML = ''; 
-    // availableThemes.forEach(theme => {
-    //     const option = document.createElement('option');
-    //     option.value = theme.id;
-    //     option.textContent = theme.name;
-    //     themeSelector.appendChild(option);
-    // });
-    // const savedThemePreference = initialGameData.currentTheme || 'default';
-    // themeSelector.value = savedThemePreference;
-    // themeSelector.addEventListener('change', (e) => {
-    //     const selectedThemeId = e.target.value;
-    //     const currentDarkModeState = document.body.classList.contains('dark');
-    //     applyTheme(selectedThemeId, currentDarkModeState);
-    //     console.log(`[main.js] User selected theme: ${selectedThemeId}. Applied immediately.`);
-    // });
-    console.log('[main.js] Theme selector logic delegated to standalone themeManager.js.');
-    // --- End Theme Selector ---
+    if (xpTextEl) xpTextEl.textContent = 'XP: N/A';
+    if (xpFillEl) xpFillEl.style.width = '0%';
+    if (streakBadgeEl) streakBadgeEl.textContent = 'Streak: N/A';
 
-    // Initialize XP Tracker UI - COMMENT OUT IF IT RELIES ON PROFILE
-    // initXPTracker(); // COMMENT OUT (it uses profileManager)
-    // You might need to provide dummy elements if xpTracker is fully removed
-    document.querySelector('.xp-text').textContent = 'XP: N/A';
-    document.querySelector('.xp-fill').style.width = '0%'; // Reset XP bar visually
-    document.querySelector('.streak-badge').textContent = 'Streak: N/A';
-
-
-    // Update version info in footer
     updateVersionInfo();
 
-    // Event listeners for game mode buttons
-    console.log('[main.js] Attaching event listeners for game mode buttons.');
-    if (soloModeBtn) soloModeBtn.addEventListener('click', () => {
-        console.log('[main.js] Solo Mode button clicked.');
-        startGame('solo', soloModeBtn.dataset.lang);
-    });
-    if (mixLingoBtn) mixLingoBtn.addEventListener('click', () => {
-        console.log('[main.js] MixLingo button clicked.');
-        startGame('mixlingo', mixLingoBtn.dataset.lang);
-    });
-    if (wordRelicBtn) wordRelicBtn.addEventListener('click', () => {
-        console.log('[main.js] Word Relic button clicked. Attempting to start game.');
-        startGame('wordrelic', 'en');
-    });
-    if (wordSafariBtn) wordSafariBtn.addEventListener('click', () => {
-        console.log('[main.js] Word Safari button clicked. Attempting to start game.');
-        startGame('wordsafari', 'en');
-    });
+    // Event listeners for game mode buttons with logs
+    logEvent('[main.js] Attaching event listeners for game mode buttons.', 'info'); // Event log
+    if (soloModeBtn) {
+        soloModeBtn.addEventListener('click', () => {
+            logEvent('Solo Mode button clicked. Starting game...', 'click', { mode: 'solo' }); // Event log
+            startGame('solo', soloModeBtn.dataset.lang);
+        });
+    } else {
+        console.warn('[main.js] Solo Mode button not found.');
+    }
 
-    // Initialize MCQ auto-check
-    //initMCQAutoCheck(); 
+    if (mixLingoBtn) {
+        mixLingoBtn.addEventListener('click', () => {
+            logEvent('MixLingo button clicked. Starting game...', 'click', { mode: 'mixlingo' }); // Event log
+            startGame('mixlingo', mixLingoBtn.dataset.lang);
+        });
+    } else {
+        console.warn('[main.js] MixLingo button not found.');
+    }
 
-    console.log('[main.js] All UI and game modules initialized.');
+    if (wordRelicBtn) {
+        wordRelicBtn.addEventListener('click', () => {
+            logEvent('Word Relic button clicked. Starting game...', 'click', { mode: 'wordrelic' }); // Event log
+            startGame('wordrelic', 'en');
+        });
+    } else {
+        console.warn('[main.js] Word Relic button not found.');
+    }
+
+    if (wordSafariBtn) {
+        wordSafariBtn.addEventListener('click', () => {
+            logEvent('Word Safari button clicked. Starting game...', 'click', { mode: 'wordsafari' }); // Event log
+            startGame('wordsafari', 'en');
+        });
+    } else {
+        console.warn('[main.js] Word Safari button not found.');
+    }
+
+    logEvent('[main.js] All UI and game modules initialized.', 'info'); // Event log
 });
