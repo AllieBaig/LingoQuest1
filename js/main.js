@@ -13,6 +13,8 @@ import { uiManager } from './uiManager.js';
 import { updateVersionInfo } from './version.js';
 import { startGame } from './gameCore.js';
 import { logEvent } from './eventLogger.js';
+import { initStaticThemeSwitcher } from './myTheme.js';
+
 
 // Get DOM elements (keeping these for initial checks and game mode listeners)
 const soloModeBtn = document.getElementById('soloModeBtn');
