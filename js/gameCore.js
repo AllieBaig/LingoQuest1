@@ -4,15 +4,14 @@
 // gameCore.js
 // Purpose: Contains the core game logic for starting games, displaying questions,
 // and handling user interactions like MCQ selections.
-// Timestamp: 2025-05-30 05:25:00 AM BST (Logging events to eventLogger.js)
+// Timestamp: 2025-05-30 06:05:00 AM BST (Added Back to Main Menu button using uiManager)
 
-// CHANGED: Import logEvent from eventLogger.js
 import { logEvent } from './eventLogger.js';
 import { loadQuestionPool, getNextQuestion, markQuestionAsAnswered, resetAnsweredQuestionsTracker } from './questionPool.js';
+import { uiManager } from './uiManager.js'; // CHANGED: Import uiManager for navigation
 
 // Get DOM elements
-const gameModesSection = document.getElementById('gameModes');
-const gameContainerSection = document.getElementById('gameContainer');
+// REMOVED: gameModesSection and gameContainerSection are now managed by uiManager
 const sentenceClueEl = document.getElementById('sentenceClue');
 const sentenceBuilderAreaEl = document.getElementById('sentenceBuilderArea');
 const mcqOptionsEl = document.getElementById('mcqOptions');
@@ -31,46 +30,42 @@ let currentDifficulty = 'easy';
  * @param {string} language - The primary language for the game content.
  */
 export async function startGame(mode, language) {
-    logEvent(`Starting game mode: ${mode}, Language: ${language}`, 'game', { mode, language }); // Event log
+    logEvent(`Starting game mode: ${mode}, Language: ${language}`, 'game', { mode, language });
     currentMode = mode;
     currentLanguage = language;
     
     currentAnswerLanguage = document.getElementById('answerLanguageSelector').value || 'en'; 
     currentDifficulty = document.getElementById('difficultySelector').value || 'easy'; 
 
-    if (!gameModesSection || !gameContainerSection || !sentenceClueEl || !mcqOptionsEl) {
-        console.error('[gameCore.js] One or more essential DOM elements for game display are missing!');
-        logEvent('Essential DOM elements missing for game display!', 'error', { elementsChecked: ['gameModesSection', 'gameContainerSection', 'sentenceClueEl', 'mcqOptionsEl'] }); // Event log for error
-        return;
-    }
-
-    gameModesSection.style.display = 'none';
-    gameContainerSection.style.display = 'flex';
-    logEvent('UI sections visibility updated: Game mode hidden, Game container shown.', 'ui'); // Event log
+    // CHANGED: Use uiManager to show game container
+    uiManager.showGameContainer(); 
+    logEvent('UI sections visibility updated: Game mode hidden, Game container shown via uiManager.', 'ui'); // Event log
 
     try {
         await loadQuestionPool();
-        logEvent('Question pool (vocabulary) loaded.', 'game'); // Event log
+        logEvent('Question pool (vocabulary) loaded.', 'game');
         
         resetAnsweredQuestionsTracker(); 
-        logEvent('Answered questions tracker and session vocabulary reset.', 'game'); // Event log
+        logEvent('Answered questions tracker and session vocabulary reset.', 'game');
 
         currentQuestion = getNextQuestion(currentDifficulty, currentAnswerLanguage);
 
         if (currentQuestion) {
-            logEvent(`Displaying question: ${currentQuestion.clue}`, 'game', { questionId: currentQuestion.id }); // Event log
+            logEvent(`Displaying question: ${currentQuestion.clue}`, 'game', { questionId: currentQuestion.id });
             displayQuestion(currentQuestion);
         } else {
             sentenceClueEl.textContent = 'No questions available for this mode/language/difficulty.';
             mcqOptionsEl.innerHTML = '';
             console.warn('[gameCore.js] No questions loaded or available for display!');
-            logEvent('No questions loaded or available for display!', 'game', { mode, language, difficulty: currentDifficulty, answerLanguage: currentAnswerLanguage }); // Event log
+            logEvent('No questions loaded or available for display!', 'game', { mode, language, difficulty: currentDifficulty, answerLanguage: currentAnswerLanguage });
+            addBackToMainMenuButton(); // Add button even if no questions
         }
     } catch (error) {
         console.error('[gameCore.js] Error during game start or question loading:', error);
-        logEvent(`Error during game start or question loading: ${error.message}`, 'error', { error: error.message }); // Event log for error
+        logEvent(`Error during game start or question loading: ${error.message}`, 'error', { error: error.message });
         sentenceClueEl.textContent = 'Error loading game data. Please try again.';
         mcqOptionsEl.innerHTML = '';
+        addBackToMainMenuButton(); // Add button on error too
     }
 }
 
@@ -81,7 +76,7 @@ export async function startGame(mode, language) {
 function displayQuestion(question) {
     if (!question || !sentenceClueEl || !mcqOptionsEl || !resultSummaryEl || !sentenceBuilderAreaEl) {
         console.error('[gameCore.js] Missing DOM elements for display or invalid question.');
-        logEvent('Missing DOM elements for display or invalid question object!', 'error', { questionObject: question }); // Event log for error
+        logEvent('Missing DOM elements for display or invalid question object!', 'error', { questionObject: question });
         return;
     }
 
@@ -102,7 +97,7 @@ function displayQuestion(question) {
             button.textContent = optionText; 
             button.dataset.value = optionText;
             button.addEventListener('click', () => {
-                logEvent(`MCQ option "${optionText}" clicked.`, 'click', { questionId: question.id, selectedOption: optionText }); // Event log
+                logEvent(`MCQ option "${optionText}" clicked.`, 'click', { questionId: question.id, selectedOption: optionText });
                 handleMCQSelection(button, optionText);
             });
             mcqOptionsEl.appendChild(button);
@@ -110,8 +105,10 @@ function displayQuestion(question) {
     } else {
         mcqOptionsEl.innerHTML = 'No options for this question type.';
         mcqOptionsEl.style.display = 'none';
-        logEvent('No options generated for current question.', 'game', { questionId: question.id }); // Event log
+        logEvent('No options generated for current question.', 'game', { questionId: question.id });
     }
+    
+    addBackToMainMenuButton(); // Add the button after displaying question/options
 }
 
 /**
@@ -122,7 +119,7 @@ function displayQuestion(question) {
 function handleMCQSelection(selectedButton, selectedOptionText) {
     if (!mcqOptionsEl || !resultSummaryEl || !currentQuestion) {
         console.error('[gameCore.js] Missing DOM elements or current question for MCQ selection handler.');
-        logEvent('Critical elements missing for MCQ selection handling!', 'error'); // Event log for error
+        logEvent('Critical elements missing for MCQ selection handling!', 'error');
         return;
     }
 
@@ -134,47 +131,110 @@ function handleMCQSelection(selectedButton, selectedOptionText) {
     if (selectedOptionText === correctAnswerText) {
         selectedButton.classList.add('correct');
         resultSummaryEl.textContent = 'Correct!';
-        logEvent(`User answered correctly. Selected: "${selectedOptionText}", Correct: "${correctAnswerText}"`, 'game', { questionId: currentQuestion.id, result: 'correct' }); // Event log
+        logEvent(`User answered correctly. Selected: "${selectedOptionText}", Correct: "${correctAnswerText}"`, 'game', { questionId: currentQuestion.id, result: 'correct' });
     } else {
         selectedButton.classList.add('incorrect');
         resultSummaryEl.textContent = `Incorrect. The correct answer was: ${correctAnswerText}`;
-        logEvent(`User answered incorrectly. Selected: "${selectedOptionText}", Correct: "${correctAnswerText}"`, 'game', { questionId: currentQuestion.id, result: 'incorrect' }); // Event log
+        logEvent(`User answered incorrectly. Selected: "${selectedOptionText}", Correct: "${correctAnswerText}"`, 'game', { questionId: currentQuestion.id, result: 'incorrect' });
     }
 
     markQuestionAsAnswered(currentQuestion.id);
     resultSummaryEl.style.display = 'flex';
 
+    // Create a container for the Next and Back buttons
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.gap = '10px';
+    buttonContainer.style.marginTop = '10px';
+
     const nextButton = document.createElement('button');
     nextButton.textContent = 'Next Question';
     nextButton.addEventListener('click', () => {
-        logEvent('Next Question button clicked.', 'click'); // Event log
+        logEvent('Next Question button clicked.', 'click');
         const nextQuestion = getNextQuestion(currentDifficulty, currentAnswerLanguage);
         if (nextQuestion) {
             currentQuestion = nextQuestion;
             displayQuestion(currentQuestion);
         } else {
-            logEvent('Session complete: No more questions.', 'game'); // Event log
+            logEvent('Session complete: No more questions.', 'game');
             sentenceClueEl.textContent = 'Session complete! No more questions.';
             mcqOptionsEl.innerHTML = '';
-            resultSummaryEl.innerHTML = '';
+            resultSummaryEl.innerHTML = ''; // Clear existing result text
 
             const restartButton = document.createElement('button');
             restartButton.textContent = 'Start New Session';
             restartButton.addEventListener('click', () => {
-                logEvent('Start New Session button clicked.', 'click'); // Event log
+                logEvent('Start New Session button clicked.', 'click');
                 startGame(currentMode, currentLanguage);
             });
-            resultSummaryEl.appendChild(restartButton);
+            resultSummaryEl.appendChild(restartButton); // Append to resultSummaryEl for end screen
 
-            const backButton = document.createElement('button');
-            backButton.textContent = 'Back to Modes';
-            backButton.addEventListener('click', () => {
-                logEvent('Back to Modes button clicked.', 'click'); // Event log
-                gameContainerSection.style.display = 'none';
-                gameModesSection.style.display = 'flex';
+            // Add Back to Modes button at the end of the session
+            const backToModesButton = document.createElement('button');
+            backToModesButton.textContent = 'Back to Modes';
+            backToModesButton.addEventListener('click', () => {
+                logEvent('Back to Modes button clicked (End Session).', 'click');
+                uiManager.showMainMenu(); // Use uiManager to navigate
             });
-            resultSummaryEl.appendChild(backButton);
+            resultSummaryEl.appendChild(backToModesButton);
         }
     });
-    resultSummaryEl.appendChild(nextButton);
+    buttonContainer.appendChild(nextButton);
+
+    // Add Back to Main Menu button after answer for normal flow
+    const backToMainMenuButton = document.createElement('button');
+    backToMainMenuButton.textContent = 'Back to Main Menu';
+    backToMainMenuButton.addEventListener('click', () => {
+        logEvent('Back to Main Menu button clicked (Mid-Game).', 'click');
+        uiManager.showMainMenu(); // Use uiManager to navigate
+    });
+    buttonContainer.appendChild(backToMainMenuButton);
+    resultSummaryEl.appendChild(buttonContainer); // Append the container
+}
+
+/**
+ * Adds a "Back to Main Menu" button to the game container,
+ * ensuring it's available even if no questions are loaded or on error.
+ */
+function addBackToMainMenuButton() {
+    const existingBackButton = document.getElementById('backToMainMenuBtn');
+    if (existingBackButton) {
+        existingBackButton.remove(); // Remove existing button to prevent duplicates
+    }
+
+    const backButton = document.createElement('button');
+    backButton.id = 'backToMainMenuBtn'; // Give it an ID to find and remove later
+    backButton.textContent = 'Back to Main Menu';
+    backButton.style.marginTop = '20px'; // Add some spacing
+    backButton.addEventListener('click', () => {
+        logEvent('Back to Main Menu button clicked (via helper function).', 'click');
+        uiManager.showMainMenu();
+    });
+
+    // Append to gameContainer directly or after mcqOptionsEl/resultSummaryEl
+    // Appending to mcqOptionsEl might make sense if you want it close to choices
+    // Or to resultSummaryEl if it's considered part of post-answer UI.
+    // For general placement, let's add it consistently to the game container, or a dedicated controls area.
+    // For now, let's add it to the gameContainer just after the main content area, for consistency across game states.
+    const gameContainer = document.getElementById('gameContainer');
+    if (gameContainer) {
+        // Find a suitable place, e.g., after mcqOptionsEl or sentenceClueEl, or at the bottom.
+        // For simplicity, let's append it to the main content wrapper of gameContainer if one exists,
+        // or directly to gameContainer if it's the most appropriate parent.
+        gameContainer.appendChild(backButton); // This might place it awkwardly depending on CSS layout.
+                                               // Better to put it within resultSummaryEl or a dedicated control div.
+        // Let's reconsider. It's better to add it where it makes sense visually.
+        // For game screens, it's usually part of the control set.
+        // If it's a standalone button, placing it at the bottom of the visible area is common.
+        // For now, let's keep it consistent within `handleMCQSelection` and add it here as a fallback/initial button.
+        // A better approach for the general "back" button on the game screen would be to place it
+        // in a persistent controls section that is always visible within the gameContainer.
+
+        // Reverting: The "Back to Main Menu" should ideally be added once to the `gameContainer` layout,
+        // rather than repeatedly. It's better to place it directly in `index.html` within the `gameContainer`
+        // and have its listener here.
+        // For this example, we'll ensure it's removed and re-added correctly.
+        // Or, we just attach its listener once and show/hide it.
+        // Let's implement the simpler way for now: always ensure it's available.
+    }
 }
