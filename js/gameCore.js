@@ -4,9 +4,10 @@
 // gameCore.js
 // Purpose: Contains the core game logic for starting games, displaying questions,
 // and handling user interactions like MCQ selections.
-// Timestamp: 2025-05-30 09:44:48 AM BST
+// Timestamp: 2025-05-30 11:06:24 PM BST (Updated for temporary profile disable)
 
-import { profileManager } from './profileManager.js';
+// COMMENT OUT PROFILE MANAGER IMPORT
+// import { profileManager } from './profileManager.js';
 import { loadQuestionPool } from './questionPool.js';
 
 // Get DOM elements
@@ -32,16 +33,15 @@ export async function startGame(mode, language) {
     console.log(`[gameCore.js] startGame function entered. Mode: ${mode}, Language: ${language}`);
     currentMode = mode;
     currentLanguage = language;
-    currentAnswerLanguage = profileManager.getGameData().answerLanguage || 'en';
+    
+    // Use a hardcoded language since profileManager is disabled
+    currentAnswerLanguage = 'en'; 
+    // If you need difficulty from a non-profile source, you'd add it here.
+    const difficulty = 'easy'; // Hardcode difficulty for testing
 
     // Null checks for DOM elements
     if (!gameModesSection || !gameContainerSection || !sentenceClueEl || !mcqOptionsEl) {
         console.error('[gameCore.js] One or more essential DOM elements for game display are missing!');
-        // Manual log error, ensure errorLogger.js is properly imported in main.js
-        // and its initErrorLogger() is called or its global listeners are active.
-        // Assuming manualLogError is accessible via global scope or imported if needed.
-        // If errorLogger.js is a module, its exports might not be directly on window.
-        // For debugging, we'll keep console.error.
         return;
     }
 
@@ -50,14 +50,12 @@ export async function startGame(mode, language) {
     gameContainerSection.style.display = 'flex';
     console.log('[gameCore.js] UI sections visibility updated.');
 
-    const difficulty = profileManager.getGameData().difficulty;
+    // const difficulty = profileManager.getGameData().difficulty; // COMMENT OUT
     console.log(`[gameCore.js] Attempting to load questions for ${currentLanguage} (${difficulty} difficulty).`);
 
     let questions;
     if (mode === 'wordsafari') {
-        // For 'wordsafari', let's load a simple set of general questions initially
-        // You might create a specific 'loadSafariQuestions' later.
-        questions = await loadQuestionPool('en', 'easy'); // Start with easy English questions
+        questions = await loadQuestionPool('en', 'easy');
         console.log(`[gameCore.js] Safari mode: Loaded ${questions ? questions.length : 0} easy English questions.`);
     } else {
         questions = await loadQuestionPool(currentLanguage, difficulty);
@@ -132,12 +130,12 @@ function handleMCQSelection(selectedButton, selectedOption) {
     if (selectedOption.en === correctAnswer) {
         selectedButton.classList.add('correct');
         resultSummaryEl.textContent = 'Correct!';
-        profileManager.addXP(10); // Add XP for correct answer
-        profileManager.incrementStreak(); // Increment streak
+        // profileManager.addXP(10); // COMMENT OUT
+        // profileManager.incrementStreak(); // COMMENT OUT
     } else {
         selectedButton.classList.add('incorrect');
         resultSummaryEl.textContent = `Incorrect. The correct answer was: ${currentQuestion.answer[currentAnswerLanguage] || currentQuestion.answer.en}`;
-        profileManager.resetStreak(); // Reset streak for incorrect answer
+        // profileManager.resetStreak(); // COMMENT OUT
     }
 
     resultSummaryEl.style.display = 'flex'; // Show result summary
