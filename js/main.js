@@ -4,12 +4,13 @@
 // main.js
 // Purpose: Entry point for the application. Initializes UI controls, XP tracker,
 // and sets up event listeners for game mode selection.
-// Timestamp: 2025-05-30 03:01:44 AM BST (Updated for Word Relic mode, no profile)
+// Timestamp: 2025-05-30 03:41:50 AM BST (Adjusted for standalone themeManager)
 
 console.log('[main.js] FILE LOADED AND EXECUTING TOP LEVEL CODE.');
 
 import { initUIControls } from './uiModeManager.js';
-import { applyTheme, initThemeToggle, getAvailableCustomThemes } from './themeManager.js';
+// REMOVE THEME MANAGER IMPORTS, as it's now standalone and self-initializing
+// import { applyTheme, initThemeToggle, getAvailableCustomThemes } from './themeManager.js';
 import { updateVersionInfo } from './version.js';
 // COMMENT OUT XP TRACKER FOR NOW IF IT RELIES HEAVILY ON PROFILE
 // import { initXPTracker } from './xpTracker.js';
@@ -22,7 +23,7 @@ import { manualLogError } from './errorLogger.js';
 // Get DOM elements
 const soloModeBtn = document.getElementById('soloModeBtn');
 const mixLingoBtn = document.getElementById('mixLingoBtn');
-const wordRelicBtn = document.getElementById('wordRelicBtn'); // Ensure this is correctly retrieved
+const wordRelicBtn = document.getElementById('wordRelicBtn');
 const wordSafariBtn = document.getElementById('wordSafariBtn');
 
 // Add a check to see if buttons are found
@@ -35,8 +36,8 @@ console.log('wordSafariBtn:', wordSafariBtn);
 // Language selector for answers
 const answerLanguageSelector = document.getElementById('answerLanguageSelector');
 
-// Theme selector
-const themeSelector = document.getElementById('themeSelector');
+// Theme selector - This element is now handled by themeManager.js directly
+const themeSelector = document.getElementById('themeSelector'); // Still get reference if needed for other purposes, but not setup here.
 
 // --- Event Listeners and Initializations ---
 
@@ -45,14 +46,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // COMMENT OUT PROFILE-RELATED DATA FETCH
     // const initialGameData = profileManager.getGameData();
 
-    // Use default/fallback values since profile is disabled
+    // Use default/fallback values since profile is disabled (and theme data is handled by themeManager now)
     const initialGameData = {
         uiMode: 'normal',
         textSize: 'normal',
-        darkMode: false,
+        // darkMode: false, // Handled by themeManager
         difficulty: 'easy',
         answerLanguage: 'en',
-        currentTheme: 'default'
+        // currentTheme: 'default' // Handled by themeManager
     };
 
     // Initialize UI mode (normal/ascii)
@@ -71,13 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // profileManager.updateSetting('textSize', e.target.value); // COMMENT OUT
     });
 
-    // Initialize dark mode
-    // initThemeToggle(initialGameData.darkMode); // Already handled in app.js for now
-    document.getElementById('darkModeToggle').addEventListener('click', () => {
-        const newDarkModeState = !document.body.classList.contains('dark');
-        initThemeToggle(newDarkModeState);
-        // profileManager.updateSetting('darkMode', newDarkModeState); // COMMENT OUT
-    });
+    // Initialize dark mode (This toggle's event listener is now handled by themeManager.js)
+    // We only need to ensure the element exists.
+    // document.getElementById('darkModeToggle').addEventListener('click', () => {
+    //     const newDarkModeState = !document.body.classList.contains('dark');
+    //     initThemeToggle(newDarkModeState); // This now comes from themeManager itself.
+    //     // profileManager.updateSetting('darkMode', newDarkModeState); // COMMENT OUT
+    // });
 
     // Initialize difficulty selector
     document.getElementById('difficultySelector').value = initialGameData.difficulty;
@@ -92,25 +93,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Theme Selector Initialization and Event Listener ---
-    const availableThemes = getAvailableCustomThemes();
-    themeSelector.innerHTML = ''; // Clear existing options from profile
-    availableThemes.forEach(theme => {
-        const option = document.createElement('option');
-        option.value = theme.id;
-        option.textContent = theme.name;
-        themeSelector.appendChild(option);
-    });
-
-    const savedThemePreference = initialGameData.currentTheme || 'default';
-    themeSelector.value = savedThemePreference;
-
-    themeSelector.addEventListener('change', (e) => {
-        const selectedThemeId = e.target.value;
-        // profileManager.updateSetting('currentTheme', selectedThemeId); // COMMENT OUT
-        const currentDarkModeState = document.body.classList.contains('dark');
-        applyTheme(selectedThemeId, currentDarkModeState);
-        console.log(`[main.js] User selected theme: ${selectedThemeId}. Applied immediately.`);
-    });
+    // ALL THIS IS NOW HANDLED BY THE STANDALONE themeManager.js
+    // const availableThemes = getAvailableCustomThemes();
+    // themeSelector.innerHTML = ''; 
+    // availableThemes.forEach(theme => {
+    //     const option = document.createElement('option');
+    //     option.value = theme.id;
+    //     option.textContent = theme.name;
+    //     themeSelector.appendChild(option);
+    // });
+    // const savedThemePreference = initialGameData.currentTheme || 'default';
+    // themeSelector.value = savedThemePreference;
+    // themeSelector.addEventListener('change', (e) => {
+    //     const selectedThemeId = e.target.value;
+    //     const currentDarkModeState = document.body.classList.contains('dark');
+    //     applyTheme(selectedThemeId, currentDarkModeState);
+    //     console.log(`[main.js] User selected theme: ${selectedThemeId}. Applied immediately.`);
+    // });
+    console.log('[main.js] Theme selector logic delegated to standalone themeManager.js.');
     // --- End Theme Selector ---
 
     // Initialize XP Tracker UI - COMMENT OUT IF IT RELIES ON PROFILE
@@ -134,9 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('[main.js] MixLingo button clicked.');
         startGame('mixlingo', mixLingoBtn.dataset.lang);
     });
-    if (wordRelicBtn) wordRelicBtn.addEventListener('click', () => { // Modified for Relic
+    if (wordRelicBtn) wordRelicBtn.addEventListener('click', () => {
         console.log('[main.js] Word Relic button clicked. Attempting to start game.');
-        startGame('wordrelic', 'en'); // Relic will use 'en' as default language for questions
+        startGame('wordrelic', 'en');
     });
     if (wordSafariBtn) wordSafariBtn.addEventListener('click', () => {
         console.log('[main.js] Word Safari button clicked. Attempting to start game.');
