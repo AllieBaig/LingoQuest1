@@ -1,263 +1,286 @@
-// themeManager.js
-// Purpose: Manages application themes, including dark mode, cultural festivals, and national days.
-// Usage: Imported by main.js and app.js.
-// Timestamp: 2025-05-29 06:35:46 PM BST
 // License: MIT License (https://opensource.org/licenses/MIT)
+// Copyright (c) 2025 AllieBaig (https://alliebaig.github.io/LingoQuest1/)
 
-// Import profileManager to access and update user settings
-import { profileManager } from './profileManager.js';
+// themeManager.js
+// Purpose: Manages application themes (including dark mode) and provides
+// functionality to apply themes based on user preference or specific dates.
+// Designed to be a standalone module.
+// Timestamp: 2025-05-30 03:41:50 AM BST
 
-// --- Theme Definitions ---
-// Each theme object defines CSS custom properties that will override the :root defaults.
-// This allows dynamic theming by simply adding a class to the <body>.
+/**
+ * Configuration for the Theme Manager.
+ * @typedef {object} ThemeManagerConfig
+ * @property {string} themeKey - The localStorage key to store the user's theme preference.
+ * @property {string} darkModeKey - The localStorage key to store the user's dark mode preference.
+ * @property {string} defaultThemeId - The ID of the default theme to apply if no preference is found.
+ * @property {boolean} defaultDarkMode - The default dark mode state if no preference is found.
+ * @property {string} themeSelectorId - The ID of the HTML select element for theme selection.
+ * @property {string} darkModeToggleId - The ID of the HTML button/input for dark mode toggle.
+ */
 
-const themes = {
-    // Default system themes (already present)
-    'default': {}, // Represents the default :root styling (no specific class needed)
-    'dark': {
-        '--primary-color': '#66BB6A',
-        '--secondary-color': '#90CAF9',
-        '--background-color': '#2c2c2c',
-        '--text-color': '#f4f4f4',
-        '--border-color': '#555',
-        '--card-background': '#3a3a3a',
-        '--shadow-color': 'rgba(0, 0, 0, 0.3)',
-        '--button-active-bg': 'brightness(1.1)',
-    },
-
-    // --- Festival Themes (Examples - you can expand this greatly!) ---
-    'diwali': { // Festival of Lights (India) - Warm, vibrant colors
-        '--primary-color': '#FF8C00', // Deep Orange
-        '--secondary-color': '#FFD700', // Gold
-        '--background-color': '#FFF8DC', // Cornsilk
-        '--text-color': '#8B4513', // Saddle Brown
-        '--card-background': '#FFFFFF',
-        '--border-color': '#DAA520', // Goldenrod
-        '--shadow-color': 'rgba(255, 140, 0, 0.2)',
-    },
-    'halloween': { // Spooky, dark, vibrant accents
-        '--primary-color': '#FF4500', // OrangeRed
-        '--secondary-color': '#8A2BE2', // BlueViolet
-        '--background-color': '#1C1C1C', // Dark Grey
-        '--text-color': '#F5F5DC', // Beige
-        '--card-background': '#333333',
-        '--border-color': '#663399', // RebeccaPurple
-        '--shadow-color': 'rgba(0, 0, 0, 0.5)',
-    },
-    'christmas': { // Traditional Christmas colors
-        '--primary-color': '#B22222', // FireBrick (Red)
-        '--secondary-color': '#228B22', // ForestGreen
-        '--background-color': '#F0F8FF', // AliceBlue
-        '--text-color': '#2F4F4F', // DarkSlateGray
-        '--card-background': '#FFFFFF',
-        '--border-color': '#A9A9A9', // DarkGray
-        '--shadow-color': 'rgba(0, 100, 0, 0.1)',
-    },
-    'hanukkah': { // Blue and white
-        '--primary-color': '#00539B', // Deep Blue
-        '--secondary-color': '#B0C4DE', // LightSteelBlue
-        '--background-color': '#F0F8FF', // AliceBlue
-        '--text-color': '#333333',
-        '--card-background': '#FFFFFF',
-        '--border-color': '#ADD8E6', // LightBlue
-        '--shadow-color': 'rgba(0, 0, 128, 0.1)',
-    },
-    'eid': { // Often uses greens, golds, and creams
-        '--primary-color': '#228B22', // ForestGreen
-        '--secondary-color': '#DAA520', // Goldenrod
-        '--background-color': '#FDF5E6', // OldLace
-        '--text-color': '#36454F', // Charcoal
-        '--card-background': '#FFFFFF',
-        '--border-color': '#BDB76B', // DarkKhaki
-        '--shadow-color': 'rgba(34, 139, 34, 0.1)',
-    },
-
-    // --- National Day Themes (Examples - pick a few diverse ones!) ---
-    'usa-independenceday': { // Red, White, Blue
-        '--primary-color': '#B22222', // FireBrick
-        '--secondary-color': '#4682B4', // SteelBlue
-        '--background-color': '#F0F8FF', // AliceBlue
-        '--text-color': '#333333',
-        '--card-background': '#FFFFFF',
-        '--border-color': '#D3D3D3', // LightGray
-        '--shadow-color': 'rgba(70, 130, 180, 0.1)',
-    },
-    'france-bastilleday': { // Blue, White, Red
-        '--primary-color': '#00008B', // DarkBlue
-        '--secondary-color': '#B22222', // FireBrick
-        '--background-color': '#F0F8FF', // AliceBlue
-        '--text-color': '#333333',
-        '--card-background': '#FFFFFF',
-        '--border-color': '#D3D3D3',
-        '--shadow-color': 'rgba(0, 0, 139, 0.1)',
-    },
-    'india-republicday': { // Saffron, White, Green, Navy Blue
-        '--primary-color': '#FF9933', // Saffron
-        '--secondary-color': '#138808', // India Green
-        '--background-color': '#F0F8FF', // AliceBlue
-        '--text-color': '#333333',
-        '--card-background': '#FFFFFF',
-        '--border-color': '#000080', // Navy Blue (Ashoka Chakra)
-        '--shadow-color': 'rgba(255, 153, 51, 0.1)',
-    },
-    'uk-bankholiday': { // More subtle, perhaps shades of blue/grey with a splash of red
-        '--primary-color': '#1E90FF', // DodgerBlue
-        '--secondary-color': '#DC143C', // Crimson
-        '--background-color': '#F5F5F5', // WhiteSmoke
-        '--text-color': '#333333',
-        '--card-background': '#FFFFFF',
-        '--border-color': '#A9A9A9',
-        '--shadow-color': 'rgba(30, 144, 255, 0.1)',
-    },
-
-    // Add more themes here!
+/** @type {ThemeManagerConfig} */
+const themeManagerConfig = {
+    themeKey: 'appTheme',         // Key for selected theme
+    darkModeKey: 'appDarkMode',   // Key for dark mode state
+    defaultThemeId: 'default',
+    defaultDarkMode: false,
+    themeSelectorId: 'themeSelector', // ID of the <select> element
+    darkModeToggleId: 'darkModeToggle' // ID of the button/input
 };
 
-// --- Specific Date Themes (Month is 0-indexed: Jan=0, Dec=11) ---
-const specificDateThemes = [
-    { month: 9, day: 31, themeId: 'halloween' }, // October 31st
-    { month: 11, day: 25, themeId: 'christmas' }, // December 25th
-    { month: 6, day: 4, themeId: 'usa-independenceday' }, // July 4th
-    { month: 6, day: 14, themeId: 'france-bastilleday' }, // July 14th
-    { month: 0, day: 26, themeId: 'india-republicday' }, // January 26th
-    // Example for Diwali (approximate, as it's lunar) - Nov 1 this year
-    { month: 10, day: 1, themeId: 'diwali' }, // November 1st (example)
-    // Example for Eid al-Fitr (approximate, as it's lunar) - April 10 this year
-    { month: 3, day: 10, themeId: 'eid' }, // April 10th (example)
-    { month: 11, day: 2, themeId: 'hanukkah' }, // Hanukkah example (Dec 2, 2024 start)
-    // Add more specific date themes here
+/**
+ * Defines a custom theme.
+ * @typedef {object} CustomTheme
+ * @property {string} id - Unique identifier for the theme.
+ * @property {string} name - Display name for the theme.
+ * @property {string[]} classes - CSS classes to apply to the <body> element.
+ * @property {string} [dataAttribute] - Optional data attribute for special themes (e.g., 'data-ascii-mode').
+ * @property {string} [dataValue] - Optional value for the data attribute.
+ */
+
+/**
+ * Array of custom theme definitions.
+ * @type {CustomTheme[]}
+ */
+const customThemes = [
+    { id: 'default', name: 'Default', classes: ['default-theme'] },
+    { id: 'oceanic', name: 'Oceanic', classes: ['oceanic-theme'] },
+    { id: 'forest', name: 'Forest', classes: ['forest-theme'] },
+    { id: 'sunset', name: 'Sunset', classes: ['sunset-theme'] },
+    { id: 'candy', name: 'Candy', classes: ['candy-theme'] },
+    { id: 'midnight', name: 'Midnight', classes: ['midnight-theme'] },
+    { id: 'cyberpunk', name: 'Cyberpunk', classes: ['cyberpunk-theme'] },
+    { id: 'retro', name: 'Retro', classes: ['retro-theme'] },
+    { id: 'ascii', name: 'ASCII Terminal', classes: ['ascii-theme'], dataAttribute: 'data-ui-mode', dataValue: 'ascii' },
+    { id: 'random-festival', name: 'Random Festival', classes: [] }, // Classes will be dynamic
+    { id: 'random-national-day', name: 'Random National Day', classes: [] } // Classes will be dynamic
 ];
 
 /**
- * Applies the specified theme by adding/removing classes and setting CSS variables.
- * @param {string} themeId - The ID of the theme to apply (e.g., 'dark', 'diwali', 'default').
- * @param {boolean} [isDarkMode=false] - Explicitly set dark mode state if applying a 'custom' theme.
+ * Festival themes.
+ * @type {string[]}
  */
-export function applyTheme(themeId, isDarkMode = false) {
+const festivalThemes = [
+    'christmas-theme', 'halloween-theme', 'easter-theme', 'diwali-theme'
+];
+
+/**
+ * National day themes.
+ * @type {string[]}
+ */
+const nationalDayThemes = [
+    'usa-national-day-theme', 'canada-national-day-theme', 'uk-national-day-theme'
+];
+
+/**
+ * Date-specific themes, ordered by priority (later dates/more specific should be higher).
+ * @type {object[]}
+ */
+const dateSpecificThemes = [
+    { month: 12, day: 25, themeId: 'christmas-theme' }, // December 25th
+    { month: 10, day: 31, themeId: 'halloween-theme' }, // October 31st
+    { month: 4, day: 1, themeId: 'easter-theme' },     // April 1st (Example, Easter moves)
+    { month: 11, day: 1, themeId: 'diwali-theme' },     // November 1st (Example, Diwali moves)
+    { month: 7, day: 4, themeId: 'usa-national-day-theme' }, // July 4th (USA)
+    { month: 7, day: 1, themeId: 'canada-national-day-theme' }, // July 1st (Canada)
+    { month: 4, day: 23, themeId: 'uk-national-day-theme' }  // April 23rd (St. George's Day, UK)
+];
+
+/**
+ * Applies the specified theme to the document body.
+ * Removes all existing custom theme classes and adds the new ones.
+ * @param {string} themeId - The ID of the theme to apply.
+ * @param {boolean} isDarkMode - Whether dark mode should be enabled.
+ */
+export function applyTheme(themeId, isDarkMode) {
     const body = document.body;
-    
-    // Remove all existing theme-specific classes (except senior-big/very-big, os-*, lang-*)
-    // We need to keep non-color/font-size related classes like 'minimal-ui' and platform/language classes.
-    const currentClasses = Array.from(body.classList);
-    const classesToRemove = currentClasses.filter(cls => 
-        Object.keys(themes).includes(cls) || cls === 'dark'
+
+    // Remove all previous custom theme classes
+    customThemes.forEach(theme => {
+        theme.classes.forEach(cls => body.classList.remove(cls));
+        if (theme.dataAttribute) {
+            body.removeAttribute(theme.dataAttribute);
+        }
+    });
+    // Remove dynamic festival/national day classes
+    festivalThemes.forEach(cls => body.classList.remove(cls));
+    nationalDayThemes.forEach(cls => body.classList.remove(cls));
+
+    // Apply the selected theme's classes and data attributes
+    const selectedTheme = customThemes.find(t => t.id === themeId);
+    if (selectedTheme) {
+        selectedTheme.classes.forEach(cls => body.classList.add(cls));
+        if (selectedTheme.dataAttribute && selectedTheme.dataValue) {
+            body.setAttribute(selectedTheme.dataAttribute, selectedTheme.dataValue);
+        }
+    } else {
+        // Fallback for random or date-specific themes not in customThemes list
+        body.classList.add(themeId); // Apply the themeId directly as a class
+    }
+
+    // Apply dark mode or light mode
+    if (isDarkMode) {
+        body.classList.add('dark');
+        body.classList.remove('light');
+    } else {
+        body.classList.add('light');
+        body.classList.remove('dark');
+    }
+    console.log(`[themeManager.js] Applied theme: ${themeId}, Dark Mode: ${isDarkMode}`);
+}
+
+/**
+ * Initializes and toggles the dark mode state.
+ * @param {boolean} enableDarkMode - True to enable dark mode, false to disable.
+ * @param {boolean} [savePreference=true] - Whether to save the preference to localStorage.
+ */
+export function initThemeToggle(enableDarkMode, savePreference = true) {
+    const body = document.body;
+    if (enableDarkMode) {
+        body.classList.add('dark');
+        body.classList.remove('light');
+    } else {
+        body.classList.add('light');
+        body.classList.remove('dark');
+    }
+
+    const darkModeToggle = document.getElementById(themeManagerConfig.darkModeToggleId);
+    if (darkModeToggle) {
+        if (darkModeToggle.tagName === 'BUTTON') {
+            darkModeToggle.textContent = enableDarkMode ? 'Light Mode' : 'Dark Mode';
+        } else if (darkModeToggle.type === 'checkbox' || darkModeToggle.type === 'switch') {
+            darkModeToggle.checked = enableDarkMode;
+        }
+    }
+
+    if (savePreference) {
+        localStorage.setItem(themeManagerConfig.darkModeKey, enableDarkMode.toString());
+        console.log(`[themeManager.js] Dark mode preference saved: ${enableDarkMode}`);
+    }
+}
+
+/**
+ * Returns an array of available custom themes (excluding random/date-specific placeholders).
+ * @returns {CustomTheme[]}
+ */
+export function getAvailableCustomThemes() {
+    return customThemes.filter(theme => 
+        theme.id !== 'random-festival' && 
+        theme.id !== 'random-national-day'
     );
-    body.classList.remove(...classesToRemove);
-
-    // Apply specific theme if not 'default'
-    if (themeId && themeId !== 'default') {
-        const selectedTheme = themes[themeId];
-        if (selectedTheme) {
-            // Apply theme class
-            body.classList.add(themeId);
-            // Apply CSS variables for the theme
-            for (const [prop, value] of Object.entries(selectedTheme)) {
-                document.documentElement.style.setProperty(prop, value);
-            }
-        } else {
-            console.warn(`Theme '${themeId}' not found.`);
-            // Fallback to default if theme not found
-            applyTheme('default');
-            profileManager.updateSetting('currentTheme', 'default'); // Update profile if theme invalid
-        }
-    } else {
-        // Clear specific theme variables and revert to :root defaults (set in _variables.css)
-        for (const prop in themes['dark']) { // Use dark theme properties as a template for all custom properties
-            document.documentElement.style.removeProperty(prop);
-        }
-    }
-
-    // Always apply dark mode class if needed, as it can overlay any theme
-    // Or if the themeId itself implies dark mode (e.g. 'dark' themeId)
-    // For simplicity, let's keep dark mode as a separate overlay handled by initThemeToggle.
-    // If a custom theme is meant to be dark, define its colors directly.
-    
-    // If applyTheme is called with an explicit isDarkMode, ensure 'dark' class is handled
-    if (isDarkMode && !body.classList.contains('dark')) {
-        body.classList.add('dark');
-    } else if (!isDarkMode && body.classList.contains('dark')) {
-        body.classList.remove('dark');
-    }
 }
 
 /**
- * Toggles the dark mode class on the body and saves preference.
- * This function also ensures that if a specific 'custom' theme is active,
- * it respects the dark mode preference.
- * @param {boolean} [enable=null] - If true, enables dark mode. If false, disables. If null, toggles.
- */
-export function initThemeToggle(enable = null) {
-    const body = document.body;
-    let newDarkModeState;
-
-    if (enable === null) {
-        newDarkModeState = !body.classList.contains('dark');
-    } else {
-        newDarkModeState = enable;
-    }
-
-    if (newDarkModeState) {
-        body.classList.add('dark');
-    } else {
-        body.classList.remove('dark');
-    }
-    // No need to update profileManager here, as it's typically called by main.js
-    // after a user interaction or by app.js on load, and profileManager.updateSetting
-    // will handle saving.
-}
-
-/**
- * Determines if there's a specific festival/national day theme for the current date.
- * @returns {string|null} The theme ID if a specific date theme exists, otherwise null.
+ * Gets a specific date-based theme if the current date matches.
+ * @returns {string|null} The theme ID if a match is found, otherwise null.
  */
 export function getSpecificDateTheme() {
     const today = new Date();
-    const currentMonth = today.getMonth(); // 0-indexed
-    const currentDay = today.getDate(); // 1-indexed
+    const currentMonth = today.getMonth() + 1; // getMonth() is 0-indexed
+    const currentDay = today.getDate();
 
-    for (const event of specificDateThemes) {
-        if (event.month === currentMonth && event.day === currentDay) {
-            console.log(`[themeManager] Applying specific date theme: ${event.themeId}`);
-            return event.themeId;
-        }
-    }
-    return null;
+    // Find the first matching date-specific theme (priority by order in array)
+    const matchedTheme = dateSpecificThemes.find(
+        theme => theme.month === currentMonth && theme.day === currentDay
+    );
+
+    return matchedTheme ? matchedTheme.themeId : null;
 }
 
 /**
- * Returns a random festival theme ID.
- * @returns {string} A random festival theme ID.
+ * Gets a random festival theme.
+ * @returns {string} The ID of a random festival theme class.
  */
 export function getRandomFestivalTheme() {
-    const festivalThemes = Object.keys(themes).filter(id => 
-        ['diwali', 'halloween', 'christmas', 'hanukkah', 'eid'].includes(id) // Explicitly list festival themes
-    );
-    if (festivalThemes.length === 0) return 'default';
-    return festivalThemes[Math.floor(Math.random() * festivalThemes.length)];
+    const randomIndex = Math.floor(Math.random() * festivalThemes.length);
+    return festivalThemes[randomIndex];
 }
 
 /**
- * Returns a random national day theme ID.
- * @returns {string} A random national day theme ID.
+ * Gets a random national day theme.
+ * @returns {string} The ID of a random national day theme class.
  */
 export function getRandomNationalDayTheme() {
-    const nationalDayThemes = Object.keys(themes).filter(id => 
-        ['usa-independenceday', 'france-bastilleday', 'india-republicday', 'uk-bankholiday'].includes(id) // Explicitly list national day themes
-    );
-    if (nationalDayThemes.length === 0) return 'default';
-    return nationalDayThemes[Math.floor(Math.random() * nationalDayThemes.length)];
+    const randomIndex = Math.floor(Math.random() * nationalDayThemes.length);
+    return nationalDayThemes[randomIndex];
 }
 
 /**
- * Returns a list of all available custom theme IDs (excluding system themes).
- * @returns {Array<object>} An array of theme objects {id: string, name: string}.
+ * Initializes the theme manager.
+ * This function should be called once the DOM is ready.
+ * It reads preferences from localStorage and sets up event listeners.
+ * @param {ThemeManagerConfig} [configOverrides] - Optional overrides for default config.
  */
-export function getAvailableCustomThemes() {
-    return Object.keys(themes)
-        .filter(id => !['default', 'dark'].includes(id)) // Exclude default system themes
-        .map(id => ({
-            id: id,
-            name: id.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
-            // Basic capitalization for display name
-        }));
+export function initThemeManager(configOverrides = {}) {
+    Object.assign(themeManagerConfig, configOverrides);
+    console.log('[themeManager.js] Initializing theme manager with config:', themeManagerConfig);
+
+    // Load preferences from localStorage
+    let savedThemeId = localStorage.getItem(themeManagerConfig.themeKey) || themeManagerConfig.defaultThemeId;
+    let savedDarkMode = localStorage.getItem(themeManagerConfig.darkModeKey) === 'true' || themeManagerConfig.defaultDarkMode;
+
+    // Check for specific date theme overrides
+    const specificDayTheme = getSpecificDateTheme();
+    if (specificDayTheme) {
+        savedThemeId = specificDayTheme;
+        console.log(`[themeManager.js] Overriding theme with specific date theme: ${savedThemeId}`);
+    } else {
+        // Handle random themes if they were the last saved preference
+        if (savedThemeId === 'random-festival') {
+            savedThemeId = getRandomFestivalTheme();
+            console.log(`[themeManager.js] Applying random festival theme: ${savedThemeId}`);
+        } else if (savedThemeId === 'random-national-day') {
+            savedThemeId = getRandomNationalDayTheme();
+            console.log(`[themeManager.js] Applying random national day theme: ${savedThemeId}`);
+        }
+    }
+
+    // Apply initial theme and dark mode
+    applyTheme(savedThemeId, savedDarkMode);
+    initThemeToggle(savedDarkMode, false); // Don't re-save on initial set
+
+    // Setup event listener for theme selector
+    const themeSelector = document.getElementById(themeManagerConfig.themeSelectorId);
+    if (themeSelector) {
+        // Populate options first
+        const themesForDropdown = getAvailableCustomThemes();
+        themeSelector.innerHTML = ''; // Clear existing options
+        themesForDropdown.forEach(theme => {
+            const option = document.createElement('option');
+            option.value = theme.id;
+            option.textContent = theme.name;
+            themeSelector.appendChild(option);
+        });
+        // Set selected value
+        themeSelector.value = savedThemeId; // This might not match if random/date-specific was applied
+        
+        themeSelector.addEventListener('change', (e) => {
+            const selectedThemeId = e.target.value;
+            // Save preference
+            localStorage.setItem(themeManagerConfig.themeKey, selectedThemeId);
+            const currentDarkModeState = document.body.classList.contains('dark'); // Read current dark mode from body class
+            applyTheme(selectedThemeId, currentDarkModeState);
+            console.log(`[themeManager.js] User selected theme: ${selectedThemeId}. Applied and saved.`);
+        });
+    }
+
+    // Setup event listener for dark mode toggle
+    const darkModeToggle = document.getElementById(themeManagerConfig.darkModeToggleId);
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', () => {
+            const newDarkModeState = !document.body.classList.contains('dark');
+            initThemeToggle(newDarkModeState); // This also saves preference
+            
+            // Re-apply the currently selected non-random theme to ensure dark mode class is toggled correctly
+            const currentThemeId = localStorage.getItem(themeManagerConfig.themeKey) || themeManagerConfig.defaultThemeId;
+            applyTheme(currentThemeId, newDarkModeState);
+            console.log(`[themeManager.js] Dark mode toggled to: ${newDarkModeState}. Applied and saved.`);
+        });
+    }
 }
+
+// Automatically initialize the theme manager when the DOM is ready.
+// This allows the script to be dropped into any HTML without explicit calls.
+document.addEventListener('DOMContentLoaded', () => {
+    initThemeManager();
+});
