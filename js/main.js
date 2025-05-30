@@ -75,6 +75,46 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize uiManager (this handles uiMode, text size, their dropdowns, and initial view)
     uiManager.init(); // This now hides gameContainer and shows gameModesSection
     
+    const textSizeSelector = document.getElementById('textSizeSelector');
+
+if (textSizeSelector) {
+    const applyTextSize = (value) => {
+        document.body.classList.remove('text-normal', 'text-senior-big', 'text-senior-very-big');
+        switch (value) {
+            case 'senior-big':
+                document.body.classList.add('text-senior-big');
+
+                // Optional: switch to XP Senior theme automatically
+                const themeSelect = document.getElementById('themeSelector');
+                if (themeSelect && themeSelect.value !== 'windowsxp-senior') {
+                    themeSelect.value = 'windowsxp-senior';
+                    themeSelect.dispatchEvent(new Event('change'));
+                }
+                break;
+
+            case 'senior-very-big':
+                document.body.classList.add('text-senior-very-big');
+                break;
+
+            default:
+                document.body.classList.add('text-normal');
+                break;
+        }
+        localStorage.setItem('textSizePref', value);
+    };
+
+    // Set initial from storage
+    const savedSize = localStorage.getItem('textSizePref') || 'normal';
+    textSizeSelector.value = savedSize;
+    applyTextSize(savedSize);
+
+    textSizeSelector.addEventListener('change', (e) => {
+        applyTextSize(e.target.value);
+    });
+
+    console.log('[main.js] Text size selector initialized');
+}
+    
     initStaticThemeSwitcher();
     
     logEvent('[main.js] uiManager initialized (UI Mode, Text Size, and initial view applied).', 'ui');
