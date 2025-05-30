@@ -37,6 +37,7 @@ function shuffleArray(array) {
  * @returns {Promise<void>}
  */
 //export async function loadVocabulary() {
+/*
 export async function loadQuestionPool() {
     try {
         const response = await fetch('data/vocabulary.json'); // New path to generic vocabulary
@@ -53,6 +54,49 @@ export async function loadQuestionPool() {
         console.error('Error loading vocabulary:', error);
         throw error;
     }
+}
+*/
+
+// js/questionPool.js (conceptual snippet for debugging)
+
+let questionPool = []; // This should be populated by loadQuestionPool
+let answeredQuestionsIds = new Set(); // To track answered questions
+
+export async function loadQuestionPool() {
+    try {
+        const response = await fetch('data/vocabulary.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error status: ${response.status}`);
+        }
+        questionPool = await response.json(); // THIS IS WHERE IT GETS LOADED
+        console.log(`[questionPool.js] Loaded ${questionPool.length} questions.`); // Add this log
+        logEvent(`[questionPool.js] Loaded ${questionPool.length} questions.`, 'info');
+    } catch (error) {
+        console.error('[questionPool.js] Error loading vocabulary:', error);
+        throw error;
+    }
+}
+
+export function getNextQuestion(difficulty, answerLanguage) {
+    logEvent(`[questionPool.js] Attempting to get next question. Difficulty: ${difficulty}, Language: ${answerLanguage}`, 'debug');
+
+    // Filter for questions that match criteria AND haven't been answered yet
+    const availableQuestions = questionPool.filter(q =>
+        q.difficulty === difficulty &&
+        q.language === answerLanguage &&
+        !answeredQuestionsIds.has(q.id)
+    );
+
+    if (availableQuestions.length === 0) {
+        logEvent('[questionPool.js] No available questions matching criteria or all answered.', 'warn');
+        return null; // No questions found
+    }
+
+    // Return a random question from the available ones
+    const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+    const question = availableQuestions[randomIndex];
+    logEvent(`[questionPool.js] Selected question ID: ${question.id}`, 'debug');
+    return question;
 }
 
 /**
