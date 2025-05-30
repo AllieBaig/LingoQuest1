@@ -22,6 +22,7 @@ export function initStaticThemeSwitcher() {
             'theme-ascii-pure',
             'theme-christmas-ui',
             'theme-windowsxp',
+             'theme-windowsxp-senior',
             'theme-windows98'
         ].forEach(id => {
             document.getElementById(id)?.setAttribute('disabled', true);
@@ -29,9 +30,11 @@ export function initStaticThemeSwitcher() {
 
         // ✅ Remove all theme-related body classes
         document.body.classList.remove(
-            'ascii-ui', 'christmas', 'pure',
-            'christmas-ui', 'windowsxp-theme', 'windows98-theme'
-        );
+  'ascii-ui', 'christmas', 'pure',
+  'christmas-ui',
+  'windowsxp-theme', 'windowsxp-senior-theme',
+  'windows98-theme'
+);
 
         // ✅ Apply selected theme
         switch (selected) {
@@ -48,9 +51,14 @@ export function initStaticThemeSwitcher() {
                 document.body.classList.add('christmas-ui');
                 break;
             case 'windowsxp':
-                document.getElementById('theme-windowsxp')?.removeAttribute('disabled');
-                document.body.classList.add('windowsxp-theme');
-                break;
+    document.getElementById('theme-windowsxp')?.removeAttribute('disabled');
+    document.body.classList.add('windowsxp-theme');
+    break;
+
+case 'windowsxp-senior':
+    document.getElementById('theme-windowsxp-senior')?.removeAttribute('disabled');
+    document.body.classList.add('windowsxp-senior-theme');
+    break;
             case 'windows98':
                 document.getElementById('theme-windows98')?.removeAttribute('disabled');
                 document.body.classList.add('windows98-theme');
