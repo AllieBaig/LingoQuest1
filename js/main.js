@@ -50,26 +50,26 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Initialize UI mode (normal/ascii) and attach listener with log
-    initUIControls(initialGameData.uiMode);
+    uiModeManager(initialGameData.uiMode);
     if (uiModeSelector) {
         uiModeSelector.value = initialGameData.uiMode;
         uiModeSelector.addEventListener('change', (e) => {
             const selectedMode = e.target.value;
             logEvent(`UI Mode changed to: ${selectedMode}`, 'change', { uiMode: selectedMode }); // Event log
-            initUIControls(selectedMode);
+            uiModeManager(selectedMode);
         });
     } else {
         console.warn('[main.js] UI Mode Selector not found.');
     }
 
     // Initialize text size and attach listener with log
-    initUIControls(initialGameData.textSize);
+    uiModeManager(initialGameData.textSize);
     if (textSizeSelector) {
         textSizeSelector.value = initialGameData.textSize;
         textSizeSelector.addEventListener('change', (e) => {
             const selectedSize = e.target.value;
             logEvent(`Text Size changed to: ${selectedSize}`, 'change', { textSize: selectedSize }); // Event log
-            initUIControls(selectedSize);
+            uiModeManager(selectedSize);
         });
     } else {
         console.warn('[main.js] Text Size Selector not found.');
