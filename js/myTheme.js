@@ -1,9 +1,8 @@
-
 /*
  * myTheme.js
  * Purpose: Provides static theme switching logic (no dependency on themeManager.js).
- * Supports ASCII, Christmas (Normal and ASCII), and Windows XP emoji-based themes.
- * Timestamp: 2025-05-30 07:10 | File: scripts/utils/myTheme.js
+ * Supports ASCII, Christmas (Normal and ASCII), Windows XP, and Windows 98.
+ * Timestamp: 2025-05-30 07:10 | File: js/myTheme.js
  * MIT License: https://github.com/AllieBaig/LingoQuest/blob/main/LICENSE
  */
 
@@ -17,17 +16,24 @@ export function initStaticThemeSwitcher() {
     themeSelector.addEventListener('change', (e) => {
         const selected = e.target.value;
 
-        // Disable all custom theme stylesheets
-        ['theme-christmas', 'theme-ascii-pure', 'theme-christmas-ui', 'theme-windowsxp'].forEach(id => {
+        // ✅ Disable all known theme stylesheets
+        [
+            'theme-christmas',
+            'theme-ascii-pure',
+            'theme-christmas-ui',
+            'theme-windowsxp',
+            'theme-windows98'
+        ].forEach(id => {
             document.getElementById(id)?.setAttribute('disabled', true);
         });
 
-        // Remove all custom theme classes
+        // ✅ Remove all theme-related body classes
         document.body.classList.remove(
-            'ascii-ui', 'christmas', 'pure', 'christmas-ui', 'windowsxp-theme'
+            'ascii-ui', 'christmas', 'pure',
+            'christmas-ui', 'windowsxp-theme', 'windows98-theme'
         );
 
-        // Apply the selected theme
+        // ✅ Apply selected theme
         switch (selected) {
             case 'christmas-theme':
                 document.getElementById('theme-christmas')?.removeAttribute('disabled');
@@ -45,12 +51,16 @@ export function initStaticThemeSwitcher() {
                 document.getElementById('theme-windowsxp')?.removeAttribute('disabled');
                 document.body.classList.add('windowsxp-theme');
                 break;
+            case 'windows98':
+                document.getElementById('theme-windows98')?.removeAttribute('disabled');
+                document.body.classList.add('windows98-theme');
+                break;
             default:
                 console.log(`[myTheme.js] No theme logic for: ${selected}`);
                 break;
         }
 
-        // Save user's preference
+        // ✅ Save selection
         localStorage.setItem('appTheme', selected);
         console.log(`[myTheme.js] Static theme applied: ${selected}`);
     });
