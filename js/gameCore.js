@@ -4,7 +4,7 @@
 // gameCore.js
 // Purpose: Contains the core game logic for starting games, displaying questions,
 // and handling user interactions like MCQ selections.
-// Timestamp: 2025-05-30 11:06:24 PM BST (Updated for temporary profile disable)
+// Timestamp: 2025-05-30 03:01:44 AM BST (Updated for Word Relic mode, no profile)
 
 // COMMENT OUT PROFILE MANAGER IMPORT
 // import { profileManager } from './profileManager.js';
@@ -26,7 +26,7 @@ let currentAnswerLanguage = 'en'; // Language for the answers (e.g., French clue
 
 /**
  * Starts a selected game mode.
- * @param {string} mode - The game mode to start (e.g., 'solo', 'mixlingo', 'wordsafari').
+ * @param {string} mode - The game mode to start (e.g., 'solo', 'mixlingo', 'wordrelic', 'wordsafari').
  * @param {string} language - The primary language for the game content (e.g., 'fr' for French clues).
  */
 export async function startGame(mode, language) {
@@ -34,9 +34,8 @@ export async function startGame(mode, language) {
     currentMode = mode;
     currentLanguage = language;
     
-    // Use a hardcoded language since profileManager is disabled
+    // Use hardcoded values since profileManager is disabled
     currentAnswerLanguage = 'en'; 
-    // If you need difficulty from a non-profile source, you'd add it here.
     const difficulty = 'easy'; // Hardcode difficulty for testing
 
     // Null checks for DOM elements
@@ -50,14 +49,17 @@ export async function startGame(mode, language) {
     gameContainerSection.style.display = 'flex';
     console.log('[gameCore.js] UI sections visibility updated.');
 
-    // const difficulty = profileManager.getGameData().difficulty; // COMMENT OUT
     console.log(`[gameCore.js] Attempting to load questions for ${currentLanguage} (${difficulty} difficulty).`);
 
     let questions;
     if (mode === 'wordsafari') {
         questions = await loadQuestionPool('en', 'easy');
         console.log(`[gameCore.js] Safari mode: Loaded ${questions ? questions.length : 0} easy English questions.`);
-    } else {
+    } else if (mode === 'wordrelic') { // New block for Word Relic
+        questions = await loadQuestionPool('en', 'medium'); // Relic can start with medium difficulty
+        console.log(`[gameCore.js] Relic mode: Loaded ${questions ? questions.length : 0} medium English questions.`);
+    }
+    else {
         questions = await loadQuestionPool(currentLanguage, difficulty);
         console.log(`[gameCore.js] Normal mode: Loaded ${questions ? questions.length : 0} questions.`);
     }
@@ -130,12 +132,12 @@ function handleMCQSelection(selectedButton, selectedOption) {
     if (selectedOption.en === correctAnswer) {
         selectedButton.classList.add('correct');
         resultSummaryEl.textContent = 'Correct!';
-        // profileManager.addXP(10); // COMMENT OUT
-        // profileManager.incrementStreak(); // COMMENT OUT
+        // profileManager.addXP(10); // COMMENTED OUT FOR NO PROFILE
+        // profileManager.incrementStreak(); // COMMENTED OUT FOR NO PROFILE
     } else {
         selectedButton.classList.add('incorrect');
         resultSummaryEl.textContent = `Incorrect. The correct answer was: ${currentQuestion.answer[currentAnswerLanguage] || currentQuestion.answer.en}`;
-        // profileManager.resetStreak(); // COMMENT OUT
+        // profileManager.resetStreak(); // COMMENTED OUT FOR NO PROFILE
     }
 
     resultSummaryEl.style.display = 'flex'; // Show result summary
