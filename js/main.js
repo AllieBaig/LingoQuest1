@@ -4,7 +4,7 @@
 // main.js
 // Purpose: Entry point for the application. Initializes UI controls, XP tracker,
 // and sets up event listeners for game mode selection.
-// Timestamp: 2025-05-30 11:06:24 PM BST (Updated for temporary profile disable)
+// Timestamp: 2025-05-30 03:01:44 AM BST (Updated for Word Relic mode, no profile)
 
 console.log('[main.js] FILE LOADED AND EXECUTING TOP LEVEL CODE.');
 
@@ -22,7 +22,7 @@ import { manualLogError } from './errorLogger.js';
 // Get DOM elements
 const soloModeBtn = document.getElementById('soloModeBtn');
 const mixLingoBtn = document.getElementById('mixLingoBtn');
-const wordRelicBtn = document.getElementById('wordRelicBtn');
+const wordRelicBtn = document.getElementById('wordRelicBtn'); // Ensure this is correctly retrieved
 const wordSafariBtn = document.getElementById('wordSafariBtn');
 
 // Add a check to see if buttons are found
@@ -117,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // initXPTracker(); // COMMENT OUT (it uses profileManager)
     // You might need to provide dummy elements if xpTracker is fully removed
     document.querySelector('.xp-text').textContent = 'XP: N/A';
+    document.querySelector('.xp-fill').style.width = '0%'; // Reset XP bar visually
     document.querySelector('.streak-badge').textContent = 'Streak: N/A';
 
 
@@ -133,10 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('[main.js] MixLingo button clicked.');
         startGame('mixlingo', mixLingoBtn.dataset.lang);
     });
-    if (wordRelicBtn) wordRelicBtn.addEventListener('click', () => {
-        console.log('[main.js] Word Relic button clicked.');
-        alert('Word Relic mode not yet implemented!');
-        manualLogError('Attempted to access unimplemented Word Relic mode.', null, 'info');
+    if (wordRelicBtn) wordRelicBtn.addEventListener('click', () => { // Modified for Relic
+        console.log('[main.js] Word Relic button clicked. Attempting to start game.');
+        startGame('wordrelic', 'en'); // Relic will use 'en' as default language for questions
     });
     if (wordSafariBtn) wordSafariBtn.addEventListener('click', () => {
         console.log('[main.js] Word Safari button clicked. Attempting to start game.');
