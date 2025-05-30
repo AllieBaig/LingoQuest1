@@ -8,7 +8,8 @@
 
 // CHANGED: Import logEvent from eventLogger.js
 import { logEvent } from './eventLogger.js';
-import { initUIControls } from './uiModeManager.js';
+//import { initUIControls } from './uiModeManager.js';
+import { uiModeManager } from './uiModeManager.js';
 import { updateVersionInfo } from './version.js';
 import { startGame } from './gameCore.js';
 
