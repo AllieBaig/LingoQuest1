@@ -36,7 +36,8 @@ function shuffleArray(array) {
  * This is now the core data source for all generated questions.
  * @returns {Promise<void>}
  */
-export async function loadVocabulary() {
+//export async function loadVocabulary() {
+export async function loadQuestionPool() {
     try {
         const response = await fetch('data/vocabulary.json'); // New path to generic vocabulary
         if (!response.ok) {
