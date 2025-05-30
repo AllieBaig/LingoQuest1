@@ -4,15 +4,15 @@
 // main.js
 // Purpose: Entry point for the application. Initializes UI controls, XP tracker,
 // and sets up event listeners for game mode selection.
-// Timestamp: 2025-05-30 05:40:00 AM BST (Fixed uiModeManager import and initialization)
+// Timestamp: 2025-05-30 06:05:00 AM BST (Using uiManager for initialization and navigation)
 
 console.log('[main.js] FILE LOADED AND EXECUTING TOP LEVEL CODE.');
 
-// CHANGED: Import the uiModeManager object, not a standalone function.
-import { uiModeManager } from './uiModeManager.js';
+// CHANGED: Import the uiManager object (new name)
+import { uiManager } from './uiManager.js';
 import { updateVersionInfo } from './version.js';
 import { startGame } from './gameCore.js';
-import { logEvent } from './eventLogger.js'; // Ensure eventLogger is still imported
+import { logEvent } from './eventLogger.js';
 
 // Get DOM elements (keeping these for initial checks and game mode listeners)
 const soloModeBtn = document.getElementById('soloModeBtn');
@@ -20,9 +20,9 @@ const mixLingoBtn = document.getElementById('mixLingoBtn');
 const wordRelicBtn = document.getElementById('wordRelicBtn');
 const wordSafariBtn = document.getElementById('wordSafariBtn');
 
-// The selectors for difficulty and answer language are distinct from uiModeManager's scope
 const answerLanguageSelector = document.getElementById('answerLanguageSelector');
 const difficultySelector = document.getElementById('difficultySelector');
+
 
 // Add a check to see if buttons are found for debugging startup
 console.log('[main.js] DOM element checks:');
@@ -32,8 +32,8 @@ console.log(`  wordRelicBtn found: ${!!wordRelicBtn}`);
 console.log(`  wordSafariBtn found: ${!!wordSafariBtn}`);
 console.log(`  answerLanguageSelector found: ${!!answerLanguageSelector}`);
 console.log(`  difficultySelector found: ${!!difficultySelector}`);
-console.log(`  uiModeSelector (handled by uiModeManager)`); // uiModeManager handles this element's setup
-console.log(`  textSizeSelector (handled by uiModeManager)`); // uiModeManager handles this element's setup
+console.log(`  uiModeSelector (handled by uiManager)`);
+console.log(`  textSizeSelector (handled by uiManager)`);
 
 
 // --- Event Listeners and Initializations ---
@@ -41,14 +41,10 @@ console.log(`  textSizeSelector (handled by uiModeManager)`); // uiModeManager h
 document.addEventListener('DOMContentLoaded', () => {
     logEvent('[main.js] DOMContent loaded. Initializing UI and game listeners.', 'info');
 
-    // Initialize uiModeManager (this handles uiMode, text size, and their dropdowns)
-    // It also sets up its own event listeners for 'change' events on its managed selectors.
-    uiModeManager.init();
-    logEvent('[main.js] uiModeManager initialized (UI Mode and Text Size applied).', 'ui');
+    // Initialize uiManager (this handles uiMode, text size, their dropdowns, and initial view)
+    uiManager.init(); // This now hides gameContainer and shows gameModesSection
+    logEvent('[main.js] uiManager initialized (UI Mode, Text Size, and initial view applied).', 'ui');
 
-    // Initial game data (fallback/defaults as profile is disabled)
-    // Note: uiMode and textSize are now handled by uiModeManager directly reading localStorage.
-    // We only need to manage other settings like difficulty and answerLanguage here.
     const initialSettings = {
         difficulty: 'easy',
         answerLanguage: 'en',
@@ -81,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Provide fallback visual states for XP/Streak if profile/XP system is disabled
     const xpTextEl = document.querySelector('.xp-text');
     const xpFillEl = document.querySelector('.xp-fill');
-    const streakBadgeEl = document.querySelector('.streak-badge');
+    const streakBadgeEl = document('.streak-badge');
 
     if (xpTextEl) xpTextEl.textContent = 'XP: N/A';
     if (xpFillEl) xpFillEl.style.width = '0%';
