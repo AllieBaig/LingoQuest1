@@ -17,7 +17,7 @@ import { updateVersionInfo } from './version.js';
 // COMMENT OUT PROFILE MANAGER IMPORT
 // import { profileManager } from './profileManager.js';
 import { startGame } from './gameCore.js';
-import { initMCQAutoCheck } from './mcqAutoCheck.js';
+//import { initMCQAutoCheck } from './mcqAutoCheck.js';
 import { manualLogError } from './errorLogger.js';
 
 // Get DOM elements
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initialize MCQ auto-check
-    initMCQAutoCheck(); 
+    //initMCQAutoCheck(); 
 
     console.log('[main.js] All UI and game modules initialized.');
 });
