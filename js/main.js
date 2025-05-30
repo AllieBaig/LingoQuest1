@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Provide fallback visual states for XP/Streak if profile/XP system is disabled
     const xpTextEl = document.querySelector('.xp-text');
     const xpFillEl = document.querySelector('.xp-fill');
-    const streakBadgeEl = document('.streak-badge');
+    const streakBadgeEl = document.querySelector('.streak-badge');
 
     if (xpTextEl) xpTextEl.textContent = 'XP: N/A';
     if (xpFillEl) xpFillEl.style.width = '0%';
