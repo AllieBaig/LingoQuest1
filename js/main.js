@@ -74,6 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize uiManager (this handles uiMode, text size, their dropdowns, and initial view)
     uiManager.init(); // This now hides gameContainer and shows gameModesSection
+    
+    initStaticThemeSwitcher();
+    
     logEvent('[main.js] uiManager initialized (UI Mode, Text Size, and initial view applied).', 'ui');
 
     const initialSettings = {
