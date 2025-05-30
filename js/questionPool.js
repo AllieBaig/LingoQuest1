@@ -116,6 +116,8 @@ export function resetSessionVocabulary() {
  * @param {string} targetAnswerLang - The language for the MCQ options ('en', 'fr', 'de').
  * @returns {object | null} The next question object with generated options, or null if no more questions.
  */
+
+/*
 export function getNextQuestion(difficulty, targetAnswerLang) {
     if (!AVAILABLE_ANSWER_LANGS.includes(targetAnswerLang)) {
         console.warn(`Invalid target answer language: ${targetAnswerLang}. Defaulting to 'en'.`);
@@ -126,6 +128,7 @@ export function getNextQuestion(difficulty, targetAnswerLang) {
     if (currentVocabularyIndex >= currentSessionVocabulary.length) {
         return null; // No more questions
     }
+    */
 
     const currentVocabEntry = currentSessionVocabulary[currentVocabularyIndex];
     const clue = `What is '${currentVocabEntry.english}' in ${getLanguageName(targetAnswerLang)}?`;
