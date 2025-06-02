@@ -14,7 +14,7 @@ import {
   renderIngameHead,
   renderIngameFoot,
   showUserError
-} from '../modeHelpers.js';
+} from '../modeHelper.js';
 
 let relicQuestions = [],
     currentIndex = 0;
