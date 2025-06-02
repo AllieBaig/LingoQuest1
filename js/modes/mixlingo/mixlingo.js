@@ -10,7 +10,7 @@
 //import { questionPool, answeredIDs, currentAnswerLang, difficulty } from './loader.js';
 import { questionPool, answeredIDs } from './state.js';
 import { currentAnswerLang, difficulty } from './loader.js';
-import { safeLoadQuestions, shuffleArray } from '../../modeHelpers.js';
+import { safeLoadQuestions, shuffleArray } from '../../modeHelper.js';
 import { createSentenceBuilderArea } from './renderer.js';
 import { loadNextQuestion } from './logic.js';
 import { renderIngameHead, renderIngameFoot, logEvent } from '../../gameUtils.js';
