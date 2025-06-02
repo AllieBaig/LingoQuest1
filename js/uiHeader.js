@@ -6,7 +6,7 @@
 5) Timestamp: 2025-05-30 22:00 | File: js/ui/uiHeader.js
 */
 
-import { getProfile } from '../js/profileManager.js';
+import { getUserProfile } from '../js/profileManager.js';
 import { renderThemeDropdown } from './themeDropdown.js';
 
 
