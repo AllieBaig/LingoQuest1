@@ -5,11 +5,11 @@
 4) Timestamp: 2025-06-03 18:55 | File: js/modeLoader.js
 */
 
-import * as mixlingoStatic from './mixlingo/mixlingo.js';
-import * as hollybollyStatic from './hollybolly/hollybolly.js';
-import * as relicStatic from './relic/relic.js';
-//import * as cinequestStatic from './cinequest/cinequest.js';
-import * as echoexpStatic from './echoexp/echo-exp.js';
+import * as mixlingoStatic from './modes/mixlingo/mixlingo.js';
+import * as hollybollyStatic from './modes/hollybolly/hollybolly.js';
+import * as relicStatic from './modes/relic/relic.js';
+//import * as cinequestStatic from './modes/cinequest/cinequest.js';
+import * as echoexpStatic from './modes/echoexp/echo-exp.js';
 
 export async function loadMode(modeName) {
   switch (modeName) {
