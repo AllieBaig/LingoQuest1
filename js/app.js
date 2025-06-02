@@ -26,11 +26,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Test dynamic imports one by one
     console.log('📤 Loading header module...');
     const headerModule = await import('./uiHeader.js');
-    const { renderHeader } = headerModule;
+    const { renderAppHeader } = headerModule;
     
     console.log('📥 Loading footer module...');
     const footerModule = await import('./uiFooter.js');
-    const { renderFooter } = footerModule;
+    const { renderAppFooter } = footerModule;
     
     console.log('🏠 Loading main menu module...');
     const mainModule = await import('./main.js');
@@ -38,10 +38,10 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // Render UI components
     console.log('🔧 Rendering header...');
-    renderHeader();
+    renderAppHeader();
     
     console.log('🔧 Rendering footer...');
-    renderFooter();
+    renderAppFooter();
     
     console.log('🔧 Showing main menu...');
     showMainMenu();
