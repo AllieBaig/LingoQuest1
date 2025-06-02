@@ -1,66 +1,35 @@
 /* 
-1) Purpose: Dynamically and statically import game modes with fallback
-2) Features: Dual import support, graceful fallback, and error logging
-3) Used by: menuRenderer.js, main.js
-4) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
-5) Timestamp: 2025-06-02 23:40 | File: js/modeLoader.js
+1) Purpose: Temporarily fallback to static-only loading of all game modes
+2) Notes: Disables dynamic `import()` to avoid runtime failures
+3) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
+4) Timestamp: 2025-06-03 18:55 | File: js/modeLoader.js
 */
 
-import * as mixlingoStatic from './modes/mixlingo/mixlingo.js';
-import * as echoExpStatic from './modes/echoexp/echo-exp.js';
-import * as relicStatic from './modes/relic/relic.js';
-//import * as cinequestStatic from './modes/cinequest/cinequest.js';
-import * as hollybollyStatic from './modes/hollybolly/hollybolly.js';
+import * as mixlingoStatic from './mixlingo/mixlingo.js';
+import * as hollybollyStatic from './hollybolly/hollybolly.js';
+import * as relicStatic from './relic/relic.js';
+//import * as cinequestStatic from './cinequest/cinequest.js';
+import * as echoexpStatic from './echoexp/echo-exp.js';
 
-import { handleGameLoadError } from './modeHelper.js';
+export async function loadMode(modeName) {
+  switch (modeName) {
+    case 'mixlingo':
+      return { start: mixlingoStatic.startMixLingo };
 
-export async function loadMode(modeName, method = 'dynamic') {
-  try {
-    switch (modeName) {
-      case 'mixlingo':
-        if (method === 'static') return { start: mixlingoStatic.startMixLingo };
-        return {
-          start: (await import('./modes/mixlingo/mixlingo.js')).startMixLingo
-        };
+    case 'hollybolly':
+      return { start: hollybollyStatic.startHollyBolly };
 
-      case 'echoexp':
-        if (method === 'static') return { start: echoExpStatic.startEchoExpedition };
-        return {
-          start: (await import('./modes/echoexp/echo-exp.js')).startEchoExpedition
-        };
+    case 'relic':
+      return { start: relicStatic.startRelic };
 
-      case 'relic':
-        if (method === 'static') return { start: relicStatic.startRelic };
-        return {
-          start: (await import('./modes/relic/relic.js')).startRelic
-        };
+  //  case 'cinequest':
+    //  return { start: cinequestStatic.startCineQuest };
 
-        /*
-        
-      case 'cinequest':
-        if (method === 'static') return { start: cinequestStatic.startCineQuest };
-        return {
-          start: (await import('./modes/cinequest/cinequest.js')).startCineQuest
-        };
-            */
+    case 'echoexp':
+      return { start: echoexpStatic.startEchoExpedition };
 
-      case 'hollybolly':
-        if (method === 'static') return { start: hollybollyStatic.startHollyBolly };
-        return {
-          start: (await import('./modes/hollybolly/hollybolly.js')).startHollyBolly
-        };
-
-      default:
-        throw new Error(`Unknown game mode: ${modeName}`);
-    }
-  } catch (err) {
-    console.warn(`⚠️ Dynamic load failed for mode ${modeName}:`, err);
-    handleGameLoadError(modeName);
-
-    // 🔁 Attempt static fallback
-    return await loadMode(modeName, 'static').catch(staticErr => {
-      console.error(`❌ Static fallback failed for mode ${modeName}:`, staticErr);
+    default:
+      console.warn(`⚠️ Unknown game mode: ${modeName}`);
       return { start: () => {} };
-    });
   }
 }
