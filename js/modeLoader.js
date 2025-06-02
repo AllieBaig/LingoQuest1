@@ -1,71 +1,63 @@
+/* 
+1) Purpose: Dynamically and statically import game modes with fallback
+2) Features: Dual import support, graceful fallback, and error logging
+3) Used by: menuRenderer.js, main.js
+4) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
+5) Timestamp: 2025-06-02 23:40 | File: js/modeLoader.js
+*/
 
-/*
- * Purpose: Handles dynamic loading of game mode modules
- * Features: Asynchronous module loading with error handling
- * MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
- * Timestamp: 2025-06-02 15:30 | file: js/modelLoader.js
- */
+import * as mixlingoStatic from './modes/mixlingo/mixlingo.js';
+import * as echoExpStatic from './modes/echoexp/echo-exp.js';
+import * as relicStatic from './modes/relic/relic.js';
+import * as cinequestStatic from './modes/cinequest/cinequest.js';
+import * as hollybollyStatic from './modes/hollybolly/hollybolly.js';
 
 import { handleGameLoadError } from './modeHelper.js';
 
-/**
- * Dynamically loads a game mode module
- * @param {string} modeKey - The key identifying the game mode
- * @returns {Promise<Object>} The loaded game mode module
- */
-export async function loadMode(modeKey) {
-    try {
-        console.log(`🔄 Loading game mode: ${modeKey}`);
-        
-        // Construct the module path based on the mode key
-        const modulePath = `./modes/${modeKey}.js`;
-        
-        // Dynamically import the module
-        const module = await import(modulePath);
-        
-        console.log(`✅ Successfully loaded: ${modeKey}`);
-        return module;
-        
-    } catch (error) {
-        console.error(`❌ Failed to load mode: ${modeKey}`, error);
-        
-        // Handle the error using the helper function
-        handleGameLoadError(error, modeKey);
-        
-        // Return a fallback module or throw the error
-        throw new Error(`Failed to load game mode: ${modeKey}`);
-    }
-}
+export async function loadMode(modeName, method = 'dynamic') {
+  try {
+    switch (modeName) {
+      case 'mixlingo':
+        if (method === 'static') return { start: mixlingoStatic.startMixLingo };
+        return {
+          start: (await import('./modes/mixlingo/mixlingo.js')).startMixLingo
+        };
 
-/**
- * Preloads multiple game modes
- * @param {string[]} modeKeys - Array of mode keys to preload
- * @returns {Promise<Object>} Object containing loaded modules
- */
-export async function preloadModes(modeKeys) {
-    const loadedModes = {};
-    
-    for (const modeKey of modeKeys) {
-        try {
-            loadedModes[modeKey] = await loadMode(modeKey);
-        } catch (error) {
-            console.warn(`⚠️ Failed to preload mode: ${modeKey}`, error);
-        }
-    }
-    
-    return loadedModes;
-}
+      case 'echoexp':
+        if (method === 'static') return { start: echoExpStatic.startEchoExpedition };
+        return {
+          start: (await import('./modes/echoexp/echo-exp.js')).startEchoExpedition
+        };
 
-/**
- * Checks if a game mode module exists
- * @param {string} modeKey - The mode key to check
- * @returns {Promise<boolean>} True if the module exists
- */
-export async function modeExists(modeKey) {
-    try {
-        await loadMode(modeKey);
-        return true;
-    } catch (error) {
-        return false;
+      case 'relic':
+        if (method === 'static') return { start: relicStatic.startRelic };
+        return {
+          start: (await import('./modes/relic/relic.js')).startRelic
+        };
+
+      case 'cinequest':
+        if (method === 'static') return { start: cinequestStatic.startCineQuest };
+        return {
+          start: (await import('./modes/cinequest/cinequest.js')).startCineQuest
+        };
+
+      case 'hollybolly':
+        if (method === 'static') return { start: hollybollyStatic.startHollyBolly };
+        return {
+          start: (await import('./modes/hollybolly/hollybolly.js')).startHollyBolly
+        };
+
+      default:
+        throw new Error(`Unknown game mode: ${modeName}`);
     }
+  } catch (err) {
+    console.warn(`⚠️ Dynamic load failed for mode ${modeName}:`, err);
+    handleGameLoadError(modeName);
+
+    // 🔁 Attempt static fallback
+    return await loadMode(modeName, 'static').catch(staticErr => {
+      console.error(`❌ Static fallback failed for mode ${modeName}:`, staticErr);
+      return { start: () => {} };
+    });
+  }
 }
