@@ -17,7 +17,10 @@ export function renderAppHeader() {
   const header = document.getElementById('appHeader');
   if (!header) return;
 
-  const profile = getProfile() || {};
+  //const profile = getProfile() || {};
+
+  const profile = getUserProfile() || {};
+  
   const avatar = profile.avatar || '🙂';
   const nickname = profile.nickname || 'Guest';
 
