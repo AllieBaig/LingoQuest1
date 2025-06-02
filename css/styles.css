@@ -1,0 +1,154 @@
+
+/* 
+1) Purpose: Global styles for LingoQuest2
+2) Features: Minimal UI layout, theme support, accessibility, font scaling
+3) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
+4) Timestamp: 2025-06-02 23:58 | File: css/styles.css
+*/
+
+:root {
+  --font-sans: system-ui, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: 'Courier New', monospace;
+  --font-hand: 'Comic Sans MS', cursive;
+
+  --game-font-size: 24px;
+
+  --bg-color: #fdfdfd;
+  --text-color: #222;
+  --accent-color: #4466cc;
+  --button-bg: #eee;
+  --button-text: #111;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--game-font-size);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --button-bg: #222;
+  --button-text: #eee;
+}
+
+button {
+  font-size: 1em;
+  padding: 0.8em 1.2em;
+  margin: 0.5em;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+button:hover {
+  background-color: var(--accent-color);
+  color: white;
+  transform: scale(1.05);
+}
+
+.menu-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.mode-button {
+  min-width: 160px;
+  font-size: 1.2em;
+}
+
+#menuArea, #gameArea, #appFooter {
+  padding: 1em;
+  max-width: 720px;
+  margin: auto;
+}
+
+#appHeader, #appFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5em 1em;
+  background: #f0f0f0;
+  border-bottom: 1px solid #ccc;
+}
+
+body.dark #appHeader, body.dark #appFooter {
+  background: #1e1e1e;
+  border-color: #444;
+}
+
+.header-block, .footer-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.settings-block {
+  margin: 1rem 0;
+}
+
+select, input[type="range"] {
+  padding: 0.4em;
+  font-size: 1em;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+#ingameHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1em;
+  margin-bottom: 1rem;
+}
+
+#xpTracker {
+  font-weight: bold;
+}
+
+.answer-lang-dropdown, #ingameFoot {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.error-box {
+  background: #ffdddd;
+  padding: 1em;
+  color: #900;
+  text-align: center;
+  margin: 1rem auto;
+  border: 1px solid #f00;
+  max-width: 600px;
+  font-size: 1.1em;
+}
+
+/* Font classes */
+.font-tinos { font-family: 'Tinos', serif; }
+.font-crimson { font-family: 'Crimson Text', serif; }
+.font-source-serif { font-family: 'Source Serif Pro', serif; }
+.font-neuton { font-family: 'Neuton', serif; }
+.font-lora { font-family: 'Lora', serif; }
+.font-sans-forgetica { font-family: 'Sans Forgetica', sans-serif; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .menu-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  button {
+    width: 100%;
+  }
+}
