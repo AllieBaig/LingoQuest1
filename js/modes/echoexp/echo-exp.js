@@ -14,7 +14,7 @@ import {
   renderIngameHead,
   renderIngameFoot,
   showUserError
-} from '../../js/modeHelper.js';
+} from '../../modeHelper.js';
 
 let echoLevels = [],
     currentIndex = 0;
