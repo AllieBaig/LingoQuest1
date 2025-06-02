@@ -9,7 +9,7 @@
 
 import { renderMixLingoHead, renderMixLingoFoot, createSentenceBuilderArea } from './renderer.js';
 import { loadNextQuestion } from './logic.js';
-import { safeLoadQuestions, shuffleArray } from '../../modeHelpers.js';
+import { safeLoadQuestions, shuffleArray } from '../../modeHelper.js';
 import { logEvent } from '../../gameUtils.js';
 import { resetMixLingoState, answeredIDs, questionPool } from './state.js';
 
