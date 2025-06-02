@@ -8,9 +8,9 @@
 6) Timestamp: 2025-06-01 01:10 | File: js/main.js
 */
 
-import { logEvent } from './tools/eventLogger.js';
+import { logEvent } from './eventLogger.js';
 import { loadMode } from './modeLoader.js';
-import { renderSettingsPanel } from './ui/uiSettingsPanel.js';
+import { renderSettingsPanel } from './uiSettingsPanel.js';
 
 // Game mode configuration
 const gameModes = [
