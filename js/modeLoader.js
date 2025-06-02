@@ -9,7 +9,7 @@
 import * as mixlingoStatic from './modes/mixlingo/mixlingo.js';
 import * as echoExpStatic from './modes/echoexp/echo-exp.js';
 import * as relicStatic from './modes/relic/relic.js';
-import * as cinequestStatic from './modes/cinequest/cinequest.js';
+//import * as cinequestStatic from './modes/cinequest/cinequest.js';
 import * as hollybollyStatic from './modes/hollybolly/hollybolly.js';
 
 import { handleGameLoadError } from './modeHelper.js';
