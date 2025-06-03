@@ -26,8 +26,8 @@
 import { logEvent, addXP, showErrorToUser, verifyQuestionStructure, shuffleArray, optionCount } from '../../modeHelper.js';
 
 import { autoCheckMCQ } from '../../gameUtils.js';
-import { renderXPBar } from '../xpTracker.js';
-
+//import { renderXPBar } from '../xpTracker.js';
+import { renderXPBar } from '../../xpTracker.js';
 
 import {
   renderHollyBollyQuestion,
