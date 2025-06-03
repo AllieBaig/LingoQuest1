@@ -13,7 +13,7 @@ import {
   verifyQuestionStructure,
   showUserError,
   optionCount
-} from '../../js/modeHelper.js';
+} from '../../modeHelper.js';
 
 export function showEchoPrompt(level, difficulty = 'medium') {
   const container = document.getElementById('sentenceBuilderArea');
