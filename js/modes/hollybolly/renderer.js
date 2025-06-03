@@ -104,12 +104,17 @@ export function renderQuestion(question) {
 */
 
 export {
-  renderQuestion,
+  renderHollyBollyQuestion,
   showCompletion,
-  showRewards
+  renderReward
 };
 
-
+/*
+// Alias exports to match logic.js expectations
+export const renderQuestion = renderHollyBollyQuestion;
+export const showCompletion = () => {}; // placeholder if needed
+export const showRewards = renderReward;
+*/
 
 
 
