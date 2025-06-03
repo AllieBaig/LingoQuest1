@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="css/cPurple.css" />
   <title>LingoQuest1</title>
 </head>
+  <script type="module" src="./js/errorHandler.js"></script>
+  <script type="module" src="./js/app.js"></script>
 <body>
   <header id="appHeader"></header>
   
@@ -26,8 +28,17 @@
     </div>
   </noscript>
 
-  <!-- ✅ ES6 Module Entry Point -->
-  <script type="module" src="js/app.js"></script>
+  <!-- ✅ ES6 Module Entry Point
+  <script type="module" src="./js/errorHandler.js"></script>
+  <script type="module" src="./js/app.js"></script>
+  -->
+  
+  <!-- Auto-capture global errors -->
+<!--   
+<script type="module">
+  import './js/errorHandler.js';
+</script>
+ -->
   
   <a href="errorLog.html" target="_blank">🪲 View Error Log</a>
   
