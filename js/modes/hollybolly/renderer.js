@@ -21,7 +21,7 @@ import {
 const difficulty = localStorage.getItem('game-difficulty') || 'medium';
 const maxOptions = optionCount[difficulty];
 
-export function renderHollyBollyQuestion(container) {
+function renderHollyBollyQuestion(container) {
   if (!currentQuestion) return showUserError('No current question.');
 
   container.innerHTML = '';
@@ -56,7 +56,7 @@ export function renderHollyBollyQuestion(container) {
   container.appendChild(mcqContainer);
 }
 
-export function renderReward(container, rewards) {
+function renderReward(container, rewards) {
   if (!container || !rewards) return;
 
   const rewardBox = document.createElement('div');
