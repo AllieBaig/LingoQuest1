@@ -88,3 +88,28 @@ export function renderReward(container, rewards) {
 
   container.appendChild(rewardBox);
 }
+
+/*
+export function showCompletion() {
+  // your completion logic
+}
+
+export function showRewards() {
+  // your reward logic
+}
+
+export function renderQuestion(question) {
+  // your rendering logic here
+}
+*/
+
+export {
+  renderQuestion,
+  showCompletion,
+  showRewards
+};
+
+
+
+
+
