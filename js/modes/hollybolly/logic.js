@@ -27,7 +27,13 @@ import { logEvent, addXP, showUserError, verifyQuestionStructure, shuffleArray, 
 
 import { autoCheckMCQ, updateXPBar } from '../../gameUtils.js';
 
-import { renderQuestion, showCompletion, showRewards } from './renderer.js';
+import {
+  renderHollyBollyQuestion,
+  showCompletion,
+  renderReward
+} from './renderer.js';
+
+//import { renderQuestion, showCompletion, showRewards } from './renderer.js';
 
 let questionPool = []; let answeredIDs = new Set(); let currentQuestion = null; let difficulty = localStorage.getItem('game-difficulty') || 'medium'; let streak = 0;
 
