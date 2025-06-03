@@ -59,9 +59,20 @@ window.addEventListener('DOMContentLoaded', async () => {
         <p>Sorry, there was a problem loading the application.</p>
         <details open style="margin-top: 20px;">
           <summary><strong>Technical Details (for developers)</strong></summary>
-          <pre style="text-align: left; background: #f5f5f5; padding: 10px; margin-top: 10px;">
+          
+          <!--
+          <pre style="text-align: left; background: #f5f5f5; 
+          padding: 10px; margin-top: 10px;">
 Error Message:
 ${error.message}
+-->
+
+<pre style="text-align: left; background: #f5f5f5; 
+padding: 10px; margin-top: 10px; font-size: 0.95em; line-height: 1.4;">
+Error Message: 
+${error.message}
+
+
 
 File/Location:
 js/app.js or dynamic import
