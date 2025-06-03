@@ -1,0 +1,273 @@
+
+[
+  {
+    "id": "dm-001",
+    "prompts": {
+      "name": "Name the being who called to you through the fog. Their name starts with an S and feels both ancient and familiar.",
+      "place": "What place did the mirror lead to? It shimmered, but it was real in the dream.",
+      "animal": "You were watched from above. Wings of glass, cry of thunder. What animal was it?",
+      "thing": "You held something tightly when the sky folded in. What was it?"
+    },
+    "answers": {
+      "name": {
+        "correct": "Selune",
+        "options": ["Selune", "Syra", "Saphor", "Selenya"]
+      },
+      "place": {
+        "correct": "Opaline Bay",
+        "options": ["Opaline Bay", "Mirrorglade", "Glassway", "Sunder Sea"]
+      },
+      "animal": {
+        "correct": "Storm Owl",
+        "options": ["Storm Owl", "Glass Falcon", "Echo Dove", "Sky Harpy"]
+      },
+      "thing": {
+        "correct": "Folded Star Map",
+        "options": ["Folded Star Map", "Amber Ring", "Memory Locket", "Cradle Stone"]
+      }
+    }
+  },
+  {
+    "id": "dm-002",
+    "prompts": {
+      "name": "The whisper came in a dream — what was their name? It began with a K and echoed like frost.",
+      "place": "Where did the cloud-ladder reach? It was not earth, not sky.",
+      "animal": "You danced with a creature of flicker and fang. What was it?",
+      "thing": "A lantern floated near your hand. What did it become?"
+    },
+    "answers": {
+      "name": {
+        "correct": "Kairo",
+        "options": ["Kairo", "Keros", "Kavin", "Kanu"]
+      },
+      "place": {
+        "correct": "Velvet Hollow",
+        "options": ["Velvet Hollow", "Echo Steppe", "Skyroot", "Wane Cavern"]
+      },
+      "animal": {
+        "correct": "Ember Fox",
+        "options": ["Ember Fox", "Shadow Lynx", "Whisper Hare", "Glow Wolf"]
+      },
+      "thing": {
+        "correct": "Moon Glass",
+        "options": ["Moon Glass", "Thought Crystal", "Memory Shell", "Wisp Mask"]
+      }
+    }
+  },
+  {
+    "id": "dm-003",
+    "prompts": {
+      "name": "The figure in the veil held a book — what was their name that began with A?",
+      "place": "Where did the spiral path lead you before waking?",
+      "animal": "A horned shadow blinked thrice — what dream creature was it?",
+      "thing": "You placed a coin into a stream. What object was returned to you?"
+    },
+    "answers": {
+      "name": {
+        "correct": "Averin",
+        "options": ["Averin", "Anora", "Ashiel", "Alen"]
+      },
+      "place": {
+        "correct": "Sable Garden",
+        "options": ["Sable Garden", "Dreamroot Glade", "Waning Hill", "Orb Swamp"]
+      },
+      "animal": {
+        "correct": "Duskhorn",
+        "options": ["Duskhorn", "Twilight Stag", "Moss Ram", "Mirror Elk"]
+      },
+      "thing": {
+        "correct": "Echo Coin",
+        "options": ["Echo Coin", "Spirit Bell", "Flame Knot", "Ink Jar"]
+      }
+    }
+  },
+  {
+    "id": "dm-004",
+    "prompts": {
+      "name": "The stars wrote their name. It began with L and ended in a question.",
+      "place": "Where did the sky crack open to?",
+      "animal": "A thousand eyes turned at once. What being held them?",
+      "thing": "You picked something from a dream-tree. What was it?"
+    },
+    "answers": {
+      "name": {
+        "correct": "Liora",
+        "options": ["Liora", "Lumen", "Laziel", "Lazra"]
+      },
+      "place": {
+        "correct": "Azure Vault",
+        "options": ["Azure Vault", "Cloudwell", "Sky Break", "Star Step"]
+      },
+      "animal": {
+        "correct": "Mirror Serpent",
+        "options": ["Mirror Serpent", "Omen Moth", "Frost Spider", "Gleam Hydra"]
+      },
+      "thing": {
+        "correct": "Wishfruit",
+        "options": ["Wishfruit", "Dream Peony", "Sleepseed", "Drift Pearl"]
+      }
+    }
+  },
+  {
+    "id": "dm-005",
+    "prompts": {
+      "name": "Someone laughed from the edge of sleep. Who was it? Their name starts with D.",
+      "place": "Where did the stairs dissolve into light?",
+      "animal": "A companion with scales and rhythm — what was it?",
+      "thing": "You clutched an object before fading. What was it?"
+    },
+    "answers": {
+      "name": {
+        "correct": "Daziel",
+        "options": ["Daziel", "Dema", "Dorne", "Darius"]
+      },
+      "place": {
+        "correct": "Lucent Citadel",
+        "options": ["Lucent Citadel", "Fade Bridge", "Aether Gate", "Glimmer Court"]
+      },
+      "animal": {
+        "correct": "Rhythm Dragon",
+        "options": ["Rhythm Dragon", "Flute Lizard", "Jade Toad", "Pulse Eel"]
+      },
+      "thing": {
+        "correct": "Sigil Feather",
+        "options": ["Sigil Feather", "Echo Card", "Veil Mirror", "Tide Charm"]
+      }
+    }
+  },
+  {
+    "id": "dm-006",
+    "prompts": {
+      "name": "A voice echoed in reverse. Their name was F-like and windborne.",
+      "place": "Where did the stars bleed into water?",
+      "animal": "You followed pawprints of fire. Whose were they?",
+      "thing": "The melody shaped into form. What did it become?"
+    },
+    "answers": {
+      "name": {
+        "correct": "Feyin",
+        "options": ["Feyin", "Farel", "Frona", "Fael"]
+      },
+      "place": {
+        "correct": "Rippled Shore",
+        "options": ["Rippled Shore", "Mirror Delta", "Lucid Pond", "Starlake"]
+      },
+      "animal": {
+        "correct": "Blaze Lynx",
+        "options": ["Blaze Lynx", "Wick Cat", "Flare Jackal", "Singe Hare"]
+      },
+      "thing": {
+        "correct": "Chime Seed",
+        "options": ["Chime Seed", "Note Vine", "Whisper Pearl", "Glass Tune"]
+      }
+    }
+  },
+  {
+    "id": "dm-007",
+    "prompts": {
+      "name": "They spoke in colors. What was their name beginning with M?",
+      "place": "Where did your footsteps turn to ink?",
+      "animal": "A cloak moved with claws beneath. Who wore it?",
+      "thing": "A cracked bowl held something alive. What was inside?"
+    },
+    "answers": {
+      "name": {
+        "correct": "Merel",
+        "options": ["Merel", "Mineth", "Myra", "Maven"]
+      },
+      "place": {
+        "correct": "Inkpath Vale",
+        "options": ["Inkpath Vale", "Shade Fold", "Script Marsh", "Ebon Trail"]
+      },
+      "animal": {
+        "correct": "Writeling Panther",
+        "options": ["Writeling Panther", "Ink Lynx", "Shadow Ferret", "Cursive Fox"]
+      },
+      "thing": {
+        "correct": "Breathlight",
+        "options": ["Breathlight", "Pulse Sap", "Glow Curl", "Dream Seed"]
+      }
+    }
+  },
+  {
+    "id": "dm-008",
+    "prompts": {
+      "name": "What name flickered across the sky like a comet? It began with Z.",
+      "place": "Where did the dream open like a book?",
+      "animal": "Wings spun like clocks — what creature was it?",
+      "thing": "Something fell from your eye. What was it?"
+    },
+    "answers": {
+      "name": {
+        "correct": "Zerel",
+        "options": ["Zerel", "Zenya", "Zuren", "Zazir"]
+      },
+      "place": {
+        "correct": "Chronoscape",
+        "options": ["Chronoscape", "Mind Scroll", "Time Hollow", "Page Plains"]
+      },
+      "animal": {
+        "correct": "Gear Moth",
+        "options": ["Gear Moth", "Chrono Bat", "Tick Wasp", "Cogswan"]
+      },
+      "thing": {
+        "correct": "Dream Tear",
+        "options": ["Dream Tear", "Memory Dust", "Ink Drop", "Ghost Petal"]
+      }
+    }
+  },
+  {
+    "id": "dm-009",
+    "prompts": {
+      "name": "The roots whispered it softly. What was their name? Starts with R.",
+      "place": "What was carved into the mountainside that became your door?",
+      "animal": "It climbed the wind silently. What dream animal was it?",
+      "thing": "You uncovered it under snow. What object?"
+    },
+    "answers": {
+      "name": {
+        "correct": "Rheya",
+        "options": ["Rheya", "Risel", "Rin", "Raza"]
+      },
+      "place": {
+        "correct": "Stone Hollow",
+        "options": ["Stone Hollow", "Echo Ridge", "Verdant Spine", "Cavern Gate"]
+      },
+      "animal": {
+        "correct": "Silent Mantis",
+        "options": ["Silent Mantis", "Climb Wasp", "Glide Spider", "Whisper Ant"]
+      },
+      "thing": {
+        "correct": "Ice Compass",
+        "options": ["Ice Compass", "Frost Medal", "Crystal Token", "Drift Ring"]
+      }
+    }
+  },
+  {
+    "id": "dm-010",
+    "prompts": {
+      "name": "The dream ended with their name — beginning with E.",
+      "place": "Where did the dream pause, just before waking?",
+      "animal": "Something soft with many eyes hovered. What was it?",
+      "thing": "What did you wear in the dream but never own?"
+    },
+    "answers": {
+      "name": {
+        "correct": "Elarin",
+        "options": ["Elarin", "Esra", "Evyn", "Elix"]
+      },
+      "place": {
+        "correct": "Hush Valley",
+        "options": ["Hush Valley", "Glim Cleft", "Lucid Nest", "Sleep Reef"]
+      },
+      "animal": {
+        "correct": "Wool Moth",
+        "options": ["Wool Moth", "Blink Bug", "Cloud Roach", "Sigh Worm"]
+      },
+      "thing": {
+        "correct": "Echo Veil",
+        "options": ["Echo Veil", "Dream Tunic", "Fog Scarf", "Sleep Hood"]
+      }
+    }
+  }
+]
