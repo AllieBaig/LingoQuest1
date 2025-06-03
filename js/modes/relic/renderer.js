@@ -15,7 +15,7 @@ import {
   renderIngameFoot,
   showUserError,
   verifyQuestionStructure
-} from '../../modeHelpers.js';
+} from '../../js/modeHelpers.js';
 
 import { getMCQOptions } from './logic.js';
 
