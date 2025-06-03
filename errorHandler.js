@@ -82,7 +82,7 @@ function getDateKey(period = 'daily') {
  * Tries to extract the likely module or script from a stack trace.
  */
 function extractModuleFromStack(stack = '') {
-  const match = stack.match(/(scripts\/[^\s'")]+)/i);
+  const match = stack.match(/(js\/[^\s'")]+)/i);
   return match ? match[1] : '';
 }
 
