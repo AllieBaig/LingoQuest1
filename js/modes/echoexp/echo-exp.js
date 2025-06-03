@@ -47,7 +47,7 @@ export async function startEchoExpedition() {
 }
 
 
-
+try {
   const lang = localStorage.getItem('answerLang') || 'en';
   echoLevels = await loadEchoExpLevels(lang);
   currentIndex = 0;
