@@ -42,3 +42,17 @@ export async function safeLoadQuestions(loaderFunc, fallbackMsg = 'Failed to loa
     return [];
   }
 }
+
+
+/**
+ * Gets the number of MCQ options based on difficulty
+ * @returns {number} Option count (2 for easy, 3 for medium, 4 for hard)
+ */
+export function optionCount() {
+  const diff = localStorage.getItem('game-difficulty') || 'medium';
+  if (diff === 'easy') return 2;
+  if (diff === 'hard') return 4;
+  return 3; // default medium
+}
+
+
