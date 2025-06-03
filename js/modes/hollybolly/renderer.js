@@ -56,6 +56,7 @@ function renderHollyBollyQuestion(container) {
   container.appendChild(mcqContainer);
 }
 
+
 function renderReward(container, rewards) {
   if (!container || !rewards) return;
 
@@ -105,7 +106,7 @@ export function renderQuestion(question) {
 
 export {
   renderHollyBollyQuestion,
-  showCompletion,
+  //showCompletion,
   renderReward
 };
 
