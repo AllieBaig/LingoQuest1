@@ -134,5 +134,16 @@ export function shuffleArray(array) {
   return array;
 }
 
+/**
+ * Verifies that a question object has all required fields
+ * @param {Object} question
+ * @param {Array<string>} requiredFields
+ * @returns {boolean}
+ */
+export function verifyQuestionStructure(question, requiredFields = ['id', 'sentence', 'correct', 'options']) {
+  if (typeof question !== 'object' || !question) return false;
+  return requiredFields.every(field => field in question);
+}
+
 
 
