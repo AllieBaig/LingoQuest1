@@ -1,6 +1,6 @@
 
 
-// MIT License — https://github.com/AllieBaig/WordAtlas/blob/main/LICENSE
+// MIT License — https://github.com/AllieBaig/LingoQuest1/blob/main/LICENSE
 
 /**
  * Logs an error object to localStorage under various time-based keys.
