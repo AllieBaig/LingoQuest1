@@ -71,3 +71,29 @@ export function addXP(points = 5) {
 }
 
 
+
+// File: js/modeHelper.js
+
+// Import from other modules
+import { logEvent, logError } from './eventLogger.js';
+import { addXP } from './xpTracker.js';
+import { createErrorContainer } from './createErrorContainer.js';
+import { safeLoadQuestions, shuffleArray, verifyQuestionStructure, optionCount } from './questionUtils.js';
+
+// Re-export them all
+export {
+  logEvent,
+  logError,
+  addXP,
+  createErrorContainer,
+  safeLoadQuestions,
+  shuffleArray,
+  verifyQuestionStructure,
+  optionCount
+};
+
+// You can also define internal helpers here (optional)
+
+
+
+
