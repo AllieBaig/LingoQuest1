@@ -37,7 +37,7 @@ export function handleGameLoadError(error, modeKey) {
  * @param {string} modeKey - The mode that failed to load
  * @param {Error} error - The original error
  */
-function showErrorToUser(modeKey, error) {
+export function showErrorToUser(modeKey, error) {
   const errorContainer = document.getElementById('error-container') || createErrorContainer();
 
   const errorMessage = `
