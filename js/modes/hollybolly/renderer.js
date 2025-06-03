@@ -16,7 +16,7 @@ import {
   optionCount,
   showUserError,
   shuffleArray
-} from '../../modeHelper.js';
+} from '../../js/modeHelper.js';
 
 const difficulty = localStorage.getItem('game-difficulty') || 'medium';
 const maxOptions = optionCount[difficulty];
