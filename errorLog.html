@@ -98,6 +98,42 @@
     renderLog();
   </script>
 
+  <script type="module">
+  import { getErrorLog, clearErrorLog } from './js/errorHandler.js';
+
+  function renderLog() {
+    const container = document.getElementById('log');
+    const errors = getErrorLog().reverse();
+
+    if (!errors.length) {
+      container.innerHTML = '<p>No errors logged.</p>';
+      return;
+    }
+
+    container.innerHTML = errors.map(e => {
+      const typeClass = e.type?.toLowerCase() || '';
+      return `
+        <div class="entry ${typeClass}">
+          <strong>${e.type?.toUpperCase() || 'ERROR'}:</strong> ${e.message}<br/>
+          <small>${e.source || ''} [${e.lineno || ''}:${e.colno || ''}]</small><br/>
+          ${e.stack ? `<pre>${e.stack}</pre>` : ''}
+          <em>${e.time}</em>
+        </div>
+      `;
+    }).join('');
+  }
+
+  window.clearLog = () => {
+    if (confirm('Clear all stored error logs?')) {
+      clearErrorLog();
+      renderLog();
+    }
+  };
+
+  renderLog();
+</script>
+  
+
 </body>
 </html>
 
