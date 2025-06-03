@@ -8,7 +8,7 @@
 */
 
 import { questionPool, currentQuestion, answeredIDs, currentAnswerLang, difficulty } from './state.js';
-import { safeLoadQuestions, shuffleArray, verifyQuestionStructure } from '../../js/modeHelper.js';
+import { safeLoadQuestions, shuffleArray, verifyQuestionStructure } from '../../modeHelper.js';
 import { renderQuestion, renderCompletionScreen } from './renderer.js';
 import { logEvent } from '../../gameUtils.js';
 
