@@ -18,7 +18,7 @@ shuffleArray,
 logEvent, 
 addXP
 
-} from '../../js/modeHelpers.js';
+} from '../../modeHelpers.js';
 
 
 import { renderRelicQuestion, showRelicCompletion } from './renderer.js';
