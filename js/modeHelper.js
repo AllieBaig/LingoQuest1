@@ -170,3 +170,19 @@ export function isValidModeKey(modeKey) {
 export function sanitizeModeKey(modeKey) {
     return modeKey.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
+
+export async function safeLoadQuestions(loaderFunc, fallbackMsg = 'Failed to load questions.') {
+  try {
+    const result = await loaderFunc();
+    if (!Array.isArray(result) || result.length === 0) {
+      throw new Error('Empty or invalid question set');
+    }
+    return result;
+  } catch (err) {
+    logError(fallbackMsg, err);
+    showUserError(fallbackMsg);
+    return [];
+  }
+}
+
+
