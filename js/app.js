@@ -56,6 +56,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.body.innerHTML = `
       <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
         <h2>⚠️ LingoQuest1 Loading Error</h2>
+        <a href="errorLog.html" target="_blank">🪲 View Error Log</a>
         <p>Sorry, there was a problem loading the application.</p>
         <details open style="margin-top: 20px;">
           <summary><strong>Technical Details (for developers)</strong></summary>
