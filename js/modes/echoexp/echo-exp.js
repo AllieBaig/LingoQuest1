@@ -16,6 +16,10 @@ import {
   showUserError
 } from '../../js/modeHelper.js';
 
+import { logInfo, logError } from '../../js/logger.js';
+
+
+
 let echoLevels = [],
     currentIndex = 0;
 
@@ -29,6 +33,20 @@ export async function startEchoExpedition() {
 
   renderIngameHead(gameArea);
   renderIngameFoot(gameArea);
+  
+  try {
+    echoQuestions = await loadEchoExpLevels();
+    currentIndex = 0;
+    logEvent('game_start', { mode: 'EchoExpedition', total: echoQuestions.length });
+    logInfo(`🚀 Loaded ${echoQuestions.length} Echo Expedition prompts.`);
+    renderEchoPrompt(echoQuestions[currentIndex]);
+  } catch (err) {
+    logError('❌ Failed to load Echo Expedition questions.', err);
+    showUserError('Unable to load Echo Expedition questions.');
+  }
+}
+
+
 
   const lang = localStorage.getItem('answerLang') || 'en';
   echoLevels = await loadEchoExpLevels(lang);
