@@ -15,7 +15,7 @@ import {
   showUserError
 } from '../../modeHelper.js';
 
-import { logInfo, logError } from '../../js/logger.js';
+import { logInfo, logError } from '../../logger.js';
 
 let echoLevels = [],
     currentIndex = 0;
