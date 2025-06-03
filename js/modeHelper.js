@@ -120,4 +120,19 @@ export async function safeLoadQuestions(loaderFunc, fallbackMsg = 'Failed to loa
   }
 }
 
+/**
+ * Randomly shuffles an array in-place using Fisher-Yates
+ * @param {Array} array
+ * @returns {Array} shuffled array
+ */
+export function shuffleArray(array) {
+  if (!Array.isArray(array)) return [];
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+
 
