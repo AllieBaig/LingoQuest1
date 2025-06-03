@@ -29,7 +29,7 @@ import { autoCheckMCQ, updateXPBar } from '../../gameUtils.js';
 
 import {
   renderHollyBollyQuestion,
-  showCompletion,
+  //showCompletion,
   renderReward
 } from './renderer.js';
 
@@ -38,6 +38,7 @@ import {
 let questionPool = []; let answeredIDs = new Set(); let currentQuestion = null; let difficulty = localStorage.getItem('game-difficulty') || 'medium'; let streak = 0;
 
 export function startGame(pool) { questionPool = shuffleArray(pool); answeredIDs.clear(); streak = 0; loadNext(); }
+
 
 function loadNext() { if (answeredIDs.size >= questionPool.length) { return showCompletion(answeredIDs.size); }
 
@@ -48,6 +49,7 @@ do { question = questionPool[Math.floor(Math.random() * questionPool.length)]; t
 const required = ['id', 'place', 'animal', 'thing', 'movie', 'bollywood', 'rewards']; if (!verifyQuestionStructure(question, required)) { answeredIDs.add(question.id); return loadNext(); }
 
 currentQuestion = question; renderQuestion(question, handleAnswer); }
+
 
 function handleAnswer(selected, correct) { const isCorrect = selected === correct;
 
@@ -64,6 +66,7 @@ if (streak === 2 || streak === 3) {
 } else { streak = 0; logEvent('answer_wrong', { id: currentQuestion.id, selected, correct, difficulty }); }
 
 answeredIDs.add(currentQuestion.id); updateXPBar(); setTimeout(loadNext, isCorrect ? 1000 : 1500); }
+
 
 function getXP() { const map = { easy: 3, medium: 5, hard: 8 }; return map[difficulty] || 5; }
 
