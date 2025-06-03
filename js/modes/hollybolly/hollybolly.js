@@ -16,7 +16,7 @@ import {
   showUserError,
   renderIngameHead,
   renderIngameFoot
-} from '../../js/modeHelper.js';
+} from '../../modeHelper.js';
 
 let questions = [];
 let currentIndex = 0;
