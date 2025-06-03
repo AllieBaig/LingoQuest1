@@ -49,7 +49,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.log('✅ LingoQuest1 app initialized successfully!');
     
   } catch (error) {
-    console.error('❌ App initialization failed:', error);
+    console.error('⚠️ App initialization failed:', error);
     console.error('📍 Error message:', error.message);
     console.error('📍 Error stack:', error.stack);
 
