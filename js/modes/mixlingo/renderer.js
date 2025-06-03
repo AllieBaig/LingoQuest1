@@ -9,7 +9,7 @@
 
 import { answeredIDs, currentQuestion, difficulty } from './state.js';
 import { autoCheckMCQ, addXP, logEvent } from '../../gameUtils.js';
-import { optionCount, showUserError } from '../../modeHelper.js';
+import { optionCount, showErrorToUser } from '../../modeHelper.js';
 import { loadNextQuestion } from './logic.js';
 
 
