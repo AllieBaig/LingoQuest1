@@ -143,6 +143,7 @@ export {
   logEvent,
   logError,
   addXP,
+  showErrorToUser
   createErrorContainer,
   handleGameLoadError,
   safeLoadQuestions,
