@@ -7,7 +7,7 @@
 5) Timestamp: 2025-06-03 00:00 | File: js/modes/echoexp/loader.js
 */
 
-import { safeLoadQuestions } from '../../js/modeHelper.js';
+import { safeLoadQuestions } from '../../modeHelper.js';
 
 export async function loadEchoExpLevels(lang = 'en') {
   const path = `lang/echo-exp.json`; // Currently not language-specific
