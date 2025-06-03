@@ -7,7 +7,7 @@
 5) Timestamp: 2025-06-01 22:30 | File: js/modes/relic/loader.js
 */
 
-import { 
+import {
 
 renderIngameHead, 
 renderIngameFoot, 
