@@ -7,7 +7,7 @@
 5) Timestamp: 2025-06-01 22:40 | File: js/modes/relic/logic.js
 */
 
-import { optionCount, shuffleArray } from '../../modeHelpers.js';
+import { optionCount, shuffleArray } from '../../modeHelper.js';
 
 // ✅ Returns shuffled options limited by difficulty
 export function getMCQOptions(question) {
