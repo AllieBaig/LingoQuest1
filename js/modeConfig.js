@@ -1,53 +1,73 @@
-
-/*
-1) Purpose: Centralized configuration for all game modes
-2) Features: Mode metadata (title, emoji, i18n keys, static import paths)
-3) Used in: menuRenderer.js, modeLoader.js, settings panels, analytics
+/* 
+1) Purpose: Centralized configuration for all LingoQuest2 game modes.
+2) Contains: Metadata like id, emoji, title, i18nKey, folder path, auto activation.
+3) Used by: modeLoader.js, menuRenderer.js, settingsPanel, future stats UI.
 4) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
-5) Timestamp: 2025-06-01 23:59 | File: js/modeConfig.js
+5) Timestamp: 2025-06-03 21:30 | File: js/modeConfig.js
 */
 
 export const gameModes = {
   mixlingo: {
-    id: 'mixlingo',
-    emoji: '🌐',
+    id: 'btnMixLingo',
+    emoji: '🧩',
     title: 'MixLingo',
-    modeKey: 'mixlingo',
-    i18nKey: 'start_mixlingo',
-    importPath: './modes/mixlingo/mixlingo.js'
+    i18nKey: 'mixlingo',
+    folder: 'mixlingo',
+    entry: 'mixlingo.js',
+    auto: true
   },
   echoexp: {
-    id: 'echoexp',
-    emoji: '🗺️',
+    id: 'btnEchoExp',
+    emoji: '🌌',
     title: 'Echo Expedition',
-    modeKey: 'echoexp',
-    i18nKey: 'start_echoexp',
-    importPath: './modes/echoexp/echo-exp.js'
+    i18nKey: 'echoexp',
+    folder: 'echoexp',
+    entry: 'echo-exp.js',
+    auto: false
   },
   relic: {
-    id: 'relic',
-    emoji: '💎',
+    id: 'btnWordRelic',
+    emoji: '🏺',
     title: 'Word Relic',
-    modeKey: 'relic',
-    i18nKey: 'start_relic',
-    importPath: './modes/relic/relic.js'
+    i18nKey: 'relic',
+    folder: 'relic',
+    entry: 'relic.js',
+    auto: false
   },
   cinequest: {
-    id: 'cinequest',
+    id: 'btnCineQuest',
     emoji: '🎬',
     title: 'CineQuest',
-    modeKey: 'cinequest',
-    i18nKey: 'start_cinequest',
-    importPath: './modes/cinequest/cinequest.js'
+    i18nKey: 'cinequest',
+    folder: 'cinequest',
+    entry: 'cinequest.js',
+    auto: false
   },
   hollybolly: {
-    id: 'hollybolly',
+    id: 'btnHollyBolly',
     emoji: '🎞️',
     title: 'HollyBolly',
-    modeKey: 'hollybolly',
-    i18nKey: 'start_hollybolly',
-    importPath: './modes/hollybolly/hollybolly.js'
+    i18nKey: 'hollybolly',
+    folder: 'hollybolly',
+    entry: 'hollybolly.js',
+    auto: false
+  },
+  safari: {
+    id: 'btnWordSafari',
+    emoji: '🦓',
+    title: 'Word Safari',
+    i18nKey: 'safari',
+    folder: 'safari',
+    entry: 'safari.js',
+    auto: false
+  },
+  dreammap: {
+    id: 'btnDreamMap',
+    emoji: '🗺️',
+    title: 'DreamMap',
+    i18nKey: 'dreammap',
+    folder: 'dreammap',
+    entry: 'dreammap.js',
+    auto: false
   }
 };
-
-
