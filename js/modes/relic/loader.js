@@ -7,7 +7,7 @@
 5) Timestamp: 2025-06-01 22:30 | File: js/modes/relic/loader.js
 */
 
-import { renderIngameHead, renderIngameFoot, showUserError, verifyQuestionStructure, safeLoadQuestions, shuffleArray, logEvent, addXP } from '../../modeHelpers.js';
+import { renderIngameHead, renderIngameFoot, showUserError, verifyQuestionStructure, safeLoadQuestions, shuffleArray, logEvent, addXP } from '../../js/modeHelpers.js';
 import { renderRelicQuestion, showRelicCompletion } from './renderer.js';
 import { getMCQOptions } from './logic.js';
 
