@@ -39,7 +39,7 @@ export async function startEchoExpedition() {
     currentIndex = 0;
     logEvent('game_start', { mode: 'EchoExpedition', total: echoQuestions.length });
     logInfo(`🚀 Loaded ${echoQuestions.length} Echo Expedition prompts.`);
-    renderEchoPrompt(echoQuestions[currentIndex]);
+    showEchoPrompt(echoQuestions[currentIndex]);
   } catch (err) {
     logError('❌ Failed to load Echo Expedition questions.', err);
     showUserError('Unable to load Echo Expedition questions.');
