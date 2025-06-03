@@ -1,4 +1,3 @@
-
 /* 
 1) Purpose: Entry point for Echo Expedition game mode
 2) Handles game start, progression, and event binding
@@ -18,8 +17,6 @@ import {
 
 import { logInfo, logError } from '../../js/logger.js';
 
-
-
 let echoLevels = [],
     currentIndex = 0;
 
@@ -35,25 +32,18 @@ export async function startEchoExpedition() {
   renderIngameFoot(gameArea);
   
   try {
-    echoQuestions = await loadEchoExpLevels();
+    const lang = localStorage.getItem('answerLang') || 'en';
+    echoLevels = await loadEchoExpLevels(lang);
     currentIndex = 0;
-    logEvent('game_start', { mode: 'EchoExpedition', total: echoQuestions.length });
-    logInfo(`🚀 Loaded ${echoQuestions.length} Echo Expedition prompts.`);
-    showEchoPrompt(echoQuestions[currentIndex]);
+
+    logEvent('game_start', { mode: 'EchoExpedition', total: echoLevels.length });
+    logInfo(`🚀 Loaded ${echoLevels.length} Echo Expedition prompts.`);
+
+    showEchoPrompt(echoLevels[currentIndex], getDifficulty());
   } catch (err) {
     logError('❌ Failed to load Echo Expedition questions.', err);
     showUserError('Unable to load Echo Expedition questions.');
   }
-}
-
-
-try {
-  const lang = localStorage.getItem('answerLang') || 'en';
-  echoLevels = await loadEchoExpLevels(lang);
-  currentIndex = 0;
-
-  logEvent('game_start', { mode: 'EchoExpedition', total: echoLevels.length });
-  showEchoPrompt(echoLevels[currentIndex], getDifficulty());
 }
 
 document.addEventListener('nextQuestion', () => {
