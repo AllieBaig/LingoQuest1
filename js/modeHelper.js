@@ -156,5 +156,22 @@ export function optionCount() {
   return 3; // default medium
 }
 
+/**
+ * Adds XP to the user's profile and updates XP tracker UI
+ * @param {number} points - XP points to add
+ */
+export function addXP(points = 5) {
+  const currentXP = parseInt(localStorage.getItem('user-xp') || '0', 10);
+  const newXP = currentXP + points;
+  localStorage.setItem('user-xp', newXP);
+
+  const bar = document.getElementById('xpTracker');
+  if (bar) {
+    bar.textContent = `XP: ${newXP}`;
+  }
+}
+
+
+
 
 
