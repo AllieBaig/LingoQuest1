@@ -1,26 +1,70 @@
+/* 
+1) Purpose: Entry point for HollyBolly game mode
+2) Loads data, renders UI, manages question flow, and reveals rewards
+3) Depends on: loader.js, renderer.js, modeHelper.js, gameUtils.js
+4) Special: Supports reward tiers (boxOffice, actorWorth, directorWorth)
+5) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
+6) Timestamp: 2025-06-02 22:45 | File: js/modes/hollybolly/hollybolly.js
+*/
 
-// File: js/modes/hollybolly/hollybolly.js
+import { loadHollyBollyData } from './loader.js';
+import { renderHollyBollyQuestion, showFinalReward } from './renderer.js';
+import {
+  logEvent,
+  logInfo,
+  logError,
+  showUserError,
+  renderIngameHead,
+  renderIngameFoot
+} from '../../js/modeHelper.js';
 
-/*
+let questions = [];
+let currentIndex = 0;
+let correctStreak = 0;
 
-1. Purpose: Entry point for HollyBolly game mode
+export async function startHollyBolly() {
+  const gameArea = document.getElementById('gameArea');
+  if (!gameArea) return showUserError('Missing game container.');
 
+  gameArea.innerHTML = '';
+  gameArea.hidden = false;
+  document.getElementById('menuArea').hidden = true;
 
-2. Features: Imports loader, logic, renderer for HollyBolly modular architecture
+  renderIngameHead(gameArea);
+  renderIngameFoot(gameArea);
 
+  try {
+    questions = await loadHollyBollyData();
+    currentIndex = 0;
+    correctStreak = 0;
 
-3. Related files: loader.js, logic.js, renderer.js
+    logEvent('game_start', { mode: 'HollyBolly', total: questions.length });
+    logInfo(`🎬 Loaded ${questions.length} HollyBolly movie challenges.`);
 
+    renderHollyBollyQuestion(questions[currentIndex], getDifficulty(), correctStreak);
+  } catch (err) {
+    logError('❌ Failed to load HollyBolly questions.', err);
+    showUserError('Unable to load HollyBolly questions.');
+  }
+}
 
-4. MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
+document.addEventListener('nextQuestion', () => {
+  currentIndex++;
+  if (currentIndex < questions.length) {
+    renderHollyBollyQuestion(questions[currentIndex], getDifficulty(), correctStreak);
+  } else {
+    showFinalReward(); // End of game
+  }
+});
 
+document.addEventListener('correctAnswer', () => {
+  correctStreak++;
+});
 
-5. Timestamp: 2025-06-01 23:50 | File: js/modes/hollybolly/hollybolly.js */
+document.addEventListener('wrongAnswer', () => {
+  correctStreak = 0;
+});
 
-
-
-import { startHollyBollyGame } from './loader.js';
-
-export function startHollyBolly() { startHollyBollyGame(); }
-
-
+function getDifficulty() {
+  return localStorage.getItem('game-difficulty') || 'medium';
+}
