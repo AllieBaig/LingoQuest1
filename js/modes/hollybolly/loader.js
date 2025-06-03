@@ -12,7 +12,7 @@ import {
   showUserError,
   verifyQuestionStructure,
   logEvent
-} from '../../js/modeHelper.js';
+} from '../../modeHelper.js';
 
 import {
   renderIngameHead,
