@@ -7,7 +7,7 @@
 5) Timestamp: 2025-06-03 00:14 | File: js/modes/cinequest/loader.js
 */
 
-import { safeLoadQuestions, shuffleArray } from '../../js/modeHelper.js';
+import { safeLoadQuestions, shuffleArray } from '../../modeHelper.js';
 
 export async function loadCineQuestQuestions(lang = 'en', decade = 'any') {
   const filePath = `lang/cinequest-${lang}.json`;
