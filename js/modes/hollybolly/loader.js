@@ -13,6 +13,9 @@ import { logEvent } from '../../eventLogger.js';
 
 import { renderIngameHead, renderIngameFoot } from '../../gameUtils.js';
 import { renderHollyBollyQuestion } from './renderer.js';
+// ✅ Correct import
+import { loadJSON } from '../../dataLoader.js';
+
 
 export let questionPool = [];
 export let answeredIDs = new Set();
