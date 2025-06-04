@@ -43,6 +43,15 @@ export function shuffleArray(array) {
 }
 
 
+/**
+ * Verifies required question fields
+ */
+export function verifyQuestionStructure(question, requiredFields = ['id', 'sentence', 'correct', 'options']) {
+  if (typeof question !== 'object' || !question) return false;
+  return requiredFields.every(field => field in question);
+}
+
+
 
 
   
