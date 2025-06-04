@@ -59,6 +59,7 @@ function attemptFallback(modeKey) {
   // You can add fallback logic here
 }
 
+/*
 // Function: isValidModeKey
 export function isValidModeKey(modeKey) {
   const validModes = [
@@ -78,4 +79,4 @@ export function sanitizeModeKey(modeKey) {
   return modeKey.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
-
+*/
