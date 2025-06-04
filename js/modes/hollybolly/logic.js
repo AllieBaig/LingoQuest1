@@ -132,7 +132,7 @@ function correctStreak() {
 export {
   startGame,
   handleAnswer,
-  CorrectStreak,
+  correctStreak,
   currentQuestion
 };
 
