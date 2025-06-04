@@ -14,7 +14,7 @@ export const gameModes = {
     i18nKey: 'mixlingo',
     folder: 'mixlingo',
     entry: 'mixlingo.js',
-    enabled: false
+    enabled: false,
     auto: false
   },
   echoexp: {
