@@ -11,8 +11,10 @@
 import {
   currentQuestion,
   correctStreak,
+  checkHollyBollyAnswer,
   handleAnswer
 } from './logic.js';
+
 
 import {
   optionCount,
