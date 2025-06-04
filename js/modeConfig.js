@@ -54,8 +54,8 @@ export const gameModes = {
     i18nKey: 'hollybolly',
     folder: 'hollybolly',
     entry: 'hollybolly.js',
-    enabled: false,
-    auto: false
+    enabled: true,
+    auto: true
   },
   safari: {
     id: 'btnWordSafari',
