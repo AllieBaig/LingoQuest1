@@ -37,7 +37,11 @@ export async function startHollyBolly() {
   renderIngameFoot(gameArea);
 
   const lang = localStorage.getItem('answer-language') || 'en';
-  const rawQuestions = await loadHollyBollyData(lang);
+  //const rawQuestions = await loadHollyBollyData(lang);
+  // ✅ Use generic loader
+const rawQuestions = await loadJSON(`lang/hollybolly-${lang}.json`);
+  
+  
   questionPool = shuffleArray(rawQuestions);
   answeredIDs.clear();
 
