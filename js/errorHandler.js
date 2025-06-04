@@ -6,6 +6,9 @@
  * Logs an error object to localStorage under various time-based keys.
  * @param {Object} error - Error object containing details like message, stack, etc.
  */
+// Consistent key for default
+const LOG_KEY = 'lq1-error-log';
+
 export function logError(error) {
   const entry = {
     ...error,
@@ -14,34 +17,22 @@ export function logError(error) {
   };
 
   ['default', 'daily', 'weekly', 'monthly'].forEach(period => {
-    const key = period === 'default' ? 'errorLog' : getDateKey(period);
+    const key = period === 'default' ? LOG_KEY : getDateKey(period);
     const logs = JSON.parse(localStorage.getItem(key) || '[]');
     logs.unshift(entry);
     localStorage.setItem(key, JSON.stringify(logs.slice(0, 100)));
   });
 }
 
-/**
- * Retrieves error logs for a specific period.
- * @param {string} period - One of 'default', 'daily', 'weekly', or 'monthly'.
- * @returns {Array} List of error log entries.
- */
-/*
 export function getErrorLog(period = 'default') {
-  const key = period === 'default' ? 'errorLog' : getDateKey(period);
-  return JSON.parse(localStorage.getItem('lq1-error-log') || '[]');
-}
-*/
-
-
-export function getErrorLog() {
-  return JSON.parse(localStorage.getItem('lq1-error-log') || '[]');
+  const key = period === 'default' ? LOG_KEY : getDateKey(period);
+  return JSON.parse(localStorage.getItem(key) || '[]');
 }
 
-export function clearErrorLog() {
-  localStorage.removeItem('lq1-error-log');
+export function clearErrorLog(period = 'default') {
+  const key = period === 'default' ? LOG_KEY : getDateKey(period);
+  localStorage.removeItem(key);
 }
-
 
 /**
  * Clears error logs for a specific period.
