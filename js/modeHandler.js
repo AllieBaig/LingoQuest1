@@ -59,6 +59,17 @@ function attemptFallback(modeKey) {
   // You can add fallback logic here
 }
 
+
+
+export {
+  showErrorToUser
+  //startGame,
+  //handleAnswer,
+  //correctStreak,
+  //currentQuestion
+};
+
+
 /*
 // Function: isValidModeKey
 export function isValidModeKey(modeKey) {
