@@ -28,8 +28,11 @@ export function logError(error) {
  */
 export function getErrorLog(period = 'default') {
   const key = period === 'default' ? 'errorLog' : getDateKey(period);
-  return JSON.parse(localStorage.getItem(key) || '[]');
+  return JSON.parse(localStorage.getItem('lq1-error-log') || '[]');
 }
+
+
+
 
 /**
  * Clears error logs for a specific period.
