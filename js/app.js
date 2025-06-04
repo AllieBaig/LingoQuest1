@@ -21,8 +21,8 @@ function initializeApp() {
   try {
     applyTheme();                  // 🌗 Theme setup
     applyUIMode();                 // 🖼 UI Mode setup (minimal, ASCII)
-    initFontScaler();             // 🔠 Font size scaling
-    initSettingsPanel();         // ⚙️ Settings panel
+    renderFontScaler();             // 🔠 Font size scaling
+    renderSettingsPanel();         // ⚙️ Settings panel
     renderGameMenu();            // 🎮 Game Mode Menu
 
     console.log('✅ App initialized successfully.');
