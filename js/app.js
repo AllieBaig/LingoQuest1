@@ -1,94 +1,46 @@
-
 /* 
-1) Purpose: Bootstraps LingoQuest1 app on load
-2) Features: Loads profile, theme, header/footer, routes to main
-3) Dependencies: profileManager.js, themeManager.js, uiHeader.js
-4) Related: js/profile/, js/ui/, js/main.js
-5) Special: Designed for large-button Minimal UI first
-6) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
-7) Timestamp: 2025-06-02 23:59 | File: js/app.js
+1) Function: initializeApp()
+2) Purpose: Main entry point for LingoQuest2 app setup
+3) Responsibilities: Theme, UI mode, settings, font scaler, game menu
+4) Depends on: themeManager.js, uiModeManager.js, fontScaler.js, uiSettingsPanel.js, menuRenderer.js
+5) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
+6) Timestamp: 2025-06-03 23:18 | File: js/app.js
 */
 
-import { initProfile } from './profileManager.js';
 import { applyTheme } from './themeManager.js';
+import { applyUIMode } from './uiModeManager.js';
+import { initFontScaler } from './fontScaler.js';
+import { initSettingsPanel } from './uiSettingsPanel.js';
+import { renderGameMenu } from './menuRenderer.js';
 
-window.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', initializeApp);
+
+function initializeApp() {
+  console.log('🚀 Initializing LingoQuest2 App...');
+
   try {
-    console.log('🚀 Starting LingoQuest1 app initialization...');
-    
-    // Initialize static imports first
-    console.log('📋 Initializing profile...');
-    initProfile();
-    
-    console.log('🎨 Applying theme...');
-    applyTheme();
-    
-    // Test dynamic imports one by one
-    console.log('📤 Loading header module...');
-    const headerModule = await import('./uiHeader.js');
-    const { renderAppHeader } = headerModule;
-    
-    console.log('📥 Loading footer module...');
-    const footerModule = await import('./uiFooter.js');
-    const { renderAppFooter } = footerModule;
-    
-    console.log('🏠 Loading main menu module...');
-    const mainModule = await import('./main.js');
-    const { showMainMenu } = mainModule;
-    
-    // Render UI components
-    console.log('🔧 Rendering header...');
-    renderAppHeader();
-    
-    console.log('🔧 Rendering footer...');
-    renderAppFooter();
-    
-    console.log('🔧 Showing main menu...');
-    showMainMenu();
-    
-    console.log('✅ LingoQuest1 app initialized successfully!');
-    
-  } catch (error) {
-    console.error('⚠️ App initialization failed:', error);
-    console.error('📍 Error message:', error.message);
-    console.error('📍 Error stack:', error.stack);
+    applyTheme();                  // 🌗 Theme setup
+    applyUIMode();                 // 🖼 UI Mode setup (minimal, ASCII)
+    initFontScaler();             // 🔠 Font size scaling
+    initSettingsPanel();         // ⚙️ Settings panel
+    renderGameMenu();            // 🎮 Game Mode Menu
 
-    document.body.innerHTML = `
-      <div style="padding: 20px; text-align: center; font-family: Arial, sans-serif;">
-        <h2>⚠️ LingoQuest1 Loading Error</h2>
-        <a href="errorLog.html" target="_blank">🪲 View Error Log</a>
-        <p>Sorry, there was a problem loading the application.</p>
-        <details open style="margin-top: 20px;">
-          <summary><strong>Technical Details (for developers)</strong></summary>
-          
-          <!--
-          <pre style="text-align: left; background: #f5f5f5; 
-          padding: 10px; margin-top: 10px;">
-Error Message:
-${error.message}
--->
+    console.log('✅ App initialized successfully.');
+  } catch (err) {
+    console.error('❌ Error during app initialization:', err);
+    showGlobalInitError();
+  }
+}
 
-<pre style="text-align: left; background: #f5f5f5; 
-padding: 10px; margin-top: 10px; font-size: 0.95em; line-height: 1.4;">
-Error Message: 
-${error.message}
-
-
-
-File/Location:
-js/app.js or dynamic import
-
-Suggested Fix:
-Check for missing files
-
-Browser Console:
-Open DevTools → Console
-
-Click Below:
-<a href="javascript:location.reload()">🔄 Reload Application</a>
-          </pre>
-        </details>
+// Optional global error message display
+function showGlobalInitError() {
+  const container = document.getElementById('menuArea');
+  if (container) {
+    container.innerHTML = `
+      <div class="error-alert">
+        <h3>⚠️ Initialization Failed</h3>
+        <p>There was a problem starting the app. Please try refreshing.</p>
       </div>
     `;
   }
-});
+}
