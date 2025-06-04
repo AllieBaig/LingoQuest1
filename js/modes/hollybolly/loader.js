@@ -8,7 +8,7 @@
 6) Timestamp: 2025-06-03 23:59 | File: js/modes/hollybolly/loader.js
 */
 
-import { safeLoadQuestions, verifyQuestionStructure, shuffleArray } from '../../questionUtils.js';
+import { safeLoadQuestions, verifyQuestionStructure, shuffleArray } from '../../questionsUtils.js';
 import { logEvent } from '../../eventLogger.js';
 
 import { renderIngameHead, renderIngameFoot } from '../../gameUtils.js';
