@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="LingoQuest1 - A multilingual word adventure!" />
+  <meta name="theme-color" content="#222222" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/cPurple.css" />
+  <title>LingoQuest1</title>
+  <script type="module" src="./js/errorHandler.js"></script>
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body>
+  <header id="appHeader"></header>
+  
+  <main>
+    <section id="menuArea"></section>
+    <section id="gameArea" hidden></section>
+  </main>
+  
+  <footer id="appFooter"></footer>
+
+  <!-- No JavaScript fallback -->
+  <noscript>
+    <div class="error-box">
+      ⚠️ JavaScript is disabled or <code>main.js</code> failed to load. Please enable JavaScript or reload the page.
+    </div>
+  </noscript>
+
+  <!-- ✅ ES6 Module Entry Point
+  <script type="module" src="./js/errorHandler.js"></script>
+  <script type="module" src="./js/app.js"></script>
+  -->
+  
+  <!-- Auto-capture global errors -->
+<!--   
+<script type="module">
+  import './js/errorHandler.js';
+</script>
+ -->
+  
+  <a href="errorLog.html" target="_blank">🪲 View Error Log</a>
+  
+</body>
+</html>
