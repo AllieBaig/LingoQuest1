@@ -28,6 +28,8 @@ import {
   renderReward
 } from './renderer.js';
 
+
+
 let questionPool = [];
 let answeredIDs = new Set();
 let currentQuestion = null;
