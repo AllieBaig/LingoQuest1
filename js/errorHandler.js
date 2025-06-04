@@ -26,22 +26,34 @@ export function logError(error) {
  * @param {string} period - One of 'default', 'daily', 'weekly', or 'monthly'.
  * @returns {Array} List of error log entries.
  */
+/*
 export function getErrorLog(period = 'default') {
   const key = period === 'default' ? 'errorLog' : getDateKey(period);
   return JSON.parse(localStorage.getItem('lq1-error-log') || '[]');
 }
+*/
 
 
+export function getErrorLog() {
+  return JSON.parse(localStorage.getItem('lq1-error-log') || '[]');
+}
+
+export function clearErrorLog() {
+  localStorage.removeItem('lq1-error-log');
+}
 
 
 /**
  * Clears error logs for a specific period.
  * @param {string} period - One of 'default', 'daily', 'weekly', or 'monthly'.
  */
+
+/*
 export function clearErrorLog(period = 'default') {
   const key = period === 'default' ? 'errorLog' : getDateKey(period);
   localStorage.removeItem(key);
 }
+*/
 
 /**
  * Optional named export for catching import-related failures explicitly.
