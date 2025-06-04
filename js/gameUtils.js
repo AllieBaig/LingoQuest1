@@ -80,3 +80,14 @@ export function verifyQuestionStructure(obj, fields = []) {
 export {
   logEvent // separate export so it's available for modeHelper bundling
 };
+
+export function optionCount() {
+  const diff = localStorage.getItem('game-difficulty') || 'medium';
+  if (diff === 'easy') return 2;
+  if (diff === 'hard') return 4;
+  return 3;
+}
+
+
+
+
