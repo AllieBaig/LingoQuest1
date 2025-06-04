@@ -1,33 +1,35 @@
 
-
-/**
- * 1) Purpose: Entry point for HollyBolly mode
- * 2) Features: Loads questions, renders UI, handles gameplay flow and rewards
- * 3) Depends on: loader.js, logic.js, renderer.js, modeHandler.js, gameUtils.js
- * 4) Related: XP system, MCQ difficulty, answer language selector, reward levels
- * 5) Special: Includes reward unlocking logic across 3 tiers (boxOffice, actorWorth, directorWorth)
- * 6) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
- * 7) Timestamp: 2025-06-03 22:52 | File: js/modes/hollybolly/hollybolly.js
- */
-
+/* 
+1) Purpose: Entry point for HollyBolly game mode
+2) Functions: startHollyBolly, getDifficulty
+3) Depends on: loader.js, logic.js, renderer.js, gameUtils.js, xpTracker.js
+4) Notes: Preserves original function names; handles rendering and MCQ validation
+5) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
+6) Timestamp: 2025-06-04 00:30 | File: js/modes/hollybolly/hollybolly.js
+*/
 
 import { loadHollyBollyData } from './loader.js';
-import { validateAnswer, showFinalReward } from './logic.js';
-import { renderHollyBollyQuestion } from './renderer.js';
+import { checkHollyBollyAnswer, getRewardTier } from './logic.js';
+import { renderHollyBollyQuestion, renderReward } from './renderer.js';
 
 import {
   logEvent,
+  logInfo,
+  logError,
+  showUserError,
   renderIngameHead,
-  renderIngameFoot,
-  addXP,
-  showUserError
-} from '../../js/gameUtils.js';
+  renderIngameFoot
+} from '../../gameUtils.js';
 
-import { resetStreak, incrementStreak, getStreak } from '../../js/xpTracker.js';
+import { addXP } from '../../xpTracker.js';
 
-let currentIndex = 0;
 let questions = [];
+let currentIndex = 0;
+let correctStreak = 0;
 
+/**
+ * Starts HollyBolly game mode
+ */
 export async function startHollyBolly() {
   const gameArea = document.getElementById('gameArea');
   if (!gameArea) return showUserError('Missing game container.');
@@ -39,46 +41,73 @@ export async function startHollyBolly() {
   renderIngameHead(gameArea);
   renderIngameFoot(gameArea);
 
-  const lang = localStorage.getItem('answerLang') || 'en';
-  const difficulty = localStorage.getItem('game-difficulty') || 'medium';
-
   try {
+    const lang = localStorage.getItem('answer-language') || 'en';
     questions = await loadHollyBollyData(lang);
     currentIndex = 0;
-    logEvent('game_start', { mode: 'HollyBolly', total: questions.length });
-    renderHollyBollyQuestion(questions[currentIndex], difficulty);
+    correctStreak = 0;
+
+    logEvent('game_start', {
+      mode: 'hollybolly',
+      total: questions.length,
+      difficulty: getDifficulty()
+    });
+
+    logInfo(`🎬 Loaded ${questions.length} HollyBolly questions.`);
+    renderHollyBollyQuestion(questions[currentIndex]);
   } catch (err) {
-    showUserError('Failed to load HollyBolly data.');
+    logError('❌ Failed to load HollyBolly questions.', err);
+    showUserError('Unable to load HollyBolly questions.');
   }
 }
 
-// Handles answer checking and reward logic
-document.addEventListener('mcqSelected', async (e) => {
+/**
+ * Handles question flow after correct answer
+ */
+document.addEventListener('nextQuestion', () => {
+  currentIndex++;
+  if (currentIndex < questions.length) {
+    renderHollyBollyQuestion(questions[currentIndex]);
+  } else {
+    showFinalReward();
+  }
+});
+
+/**
+ * Handles MCQ click and game logic
+ */
+document.addEventListener('mcqSelected', (e) => {
   const selected = e.detail;
-  const difficulty = localStorage.getItem('game-difficulty') || 'medium';
-
   const current = questions[currentIndex];
-  const correct = validateAnswer(current, selected);
+  const correctAnswer = current.movie;
 
-  if (correct) {
-    addXP(difficulty);
-    incrementStreak();
+  const result = checkHollyBollyAnswer(selected, correctAnswer);
 
-    const streak = getStreak();
-    showFinalReward(current, streak); // Shows boxOffice, actorWorth, directorWorth progressively
+  if (result.isCorrect) {
+    correctStreak++;
+    addXP(getDifficulty());
+
+    renderReward(current.rewards, result.rewardTier);
+
     currentIndex++;
-
     if (currentIndex < questions.length) {
       setTimeout(() => {
-        renderQuestion(questions[currentIndex], difficulty);
+        renderHollyBollyQuestion(questions[currentIndex]);
       }, 1000);
     } else {
-      showUserError('🎉 You completed all HollyBolly questions!');
+      showFinalReward();
     }
   } else {
-    resetStreak();
+    correctStreak = 0;
     showUserError('❌ Incorrect! Try again.');
   }
 });
+
+/**
+ * Returns difficulty level
+ */
+function getDifficulty() {
+  return localStorage.getItem('game-difficulty') || 'medium';
+}
 
 
