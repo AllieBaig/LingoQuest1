@@ -11,7 +11,7 @@
 */
 
 import { logEvent, logError } from './eventLogger.js';
-import { createErrorContainer } from './errorContainer.js';
+import { createErrorContainer } from './createErrorContainer.js';
 
 // Function: handleGameLoadError
 export function handleGameLoadError(error, modeKey) {
