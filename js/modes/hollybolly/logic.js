@@ -77,7 +77,7 @@ function loadNext() {
  * Handles user answer selection and updates XP and streak.
  * @param {string} selected 
  */
-export function handleAnswer(selected) {
+function handleAnswer(selected) {
   const correct = currentQuestion.movie;
   const isCorrect = selected === correct;
 
