@@ -23,7 +23,7 @@ export const gameModes = {
     i18nKey: 'echoexp',
     folder: 'echoexp',
     entry: 'echo-exp.js',
-    auto: false
+    auto: true
   },
   relic: {
     id: 'btnWordRelic',
