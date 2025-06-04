@@ -125,8 +125,16 @@ function updateXPBar() {
 /**
  * Returns current correct answer streak.
  */
-export function correctStreak() {
+function correctStreak() {
   return streak;
 }
+
+export {
+  startGame,
+  handleAnswer,
+  CorrectStreak,
+  currentQuestion
+};
+
 
 
