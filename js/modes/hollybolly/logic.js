@@ -152,6 +152,7 @@ function getRewardTier(streak) {
 
 export {
   startGame,
+  checkHollyBollyAnswer,
   handleAnswer,
   correctStreak,
   currentQuestion
