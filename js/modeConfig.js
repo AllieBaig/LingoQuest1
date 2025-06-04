@@ -26,8 +26,8 @@ export const gameModes = {
     i18nKey: 'echoexp',
     folder: 'echoexp',
     entry: 'echo-exp.js',
-    enabled: true,
-    auto: true
+    enabled: false,
+    auto: false
   },
   relic: {
     id: 'btnWordRelic',
@@ -37,8 +37,8 @@ export const gameModes = {
     i18nKey: 'relic',
     folder: 'relic',
     entry: 'relic.js',
-    enabled: false,
-    auto: false
+    enabled: true,
+    auto: true
   },
   cinequest: {
     id: 'btnCineQuest',
@@ -48,8 +48,8 @@ export const gameModes = {
     i18nKey: 'cinequest',
     folder: 'cinequest',
     entry: 'cinequest.js',
-    enabled: false,
-    auto: false
+    enabled: true,
+    auto: true
   },
   hollybolly: {
     id: 'btnHollyBolly',
@@ -59,8 +59,8 @@ export const gameModes = {
     i18nKey: 'hollybolly',
     folder: 'hollybolly',
     entry: 'hollybolly.js',
-    enabled: true,
-    auto: true
+    enabled: false,
+    auto: false
   },
   safari: {
     id: 'btnWordSafari',
