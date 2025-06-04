@@ -9,7 +9,7 @@
 
 import { applyTheme } from './themeManager.js';
 import { applyUIMode } from './uiModeManager.js';
-import { initFontScaler } from './fontScaler.js';
+import { renderFontScaler } from './fontScaler.js';
 import { initSettingsPanel } from './uiSettingsPanel.js';
 import { renderGameMenu } from './menuRenderer.js';
 
