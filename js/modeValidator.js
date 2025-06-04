@@ -14,7 +14,7 @@ export function isValidModeKey(modeKey) {
   const validModes = [
     'mixlingo',
     'hollybolly',
-    'echoexpedition',
+    'echoexp',
     'wordrelic',
     'dreammap',
     'cinequest',
