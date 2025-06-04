@@ -1,100 +1,108 @@
 
+/* 
+1) Purpose: Renders questions and rewards for HollyBolly mode
+2) Functions: renderHollyBollyQuestion, renderReward
+3) Depends on: logic.js, gameUtils.js, modeHelper.js
+4) Notes: Preserves original function names from older version
+5) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
+6) Timestamp: 2025-06-04 00:45 | File: js/modes/hollybolly/renderer.js
+*/
+
+import {
+  currentQuestion,
+  correctStreak,
+  handleAnswer
+} from './logic.js';
+
+import {
+  optionCount,
+  shuffleArray,
+  showUserError
+} from '../../modeHelper.js';
+
+const difficulty = localStorage.getItem('game-difficulty') || 'medium';
+const maxOptions = optionCount[difficulty] || 3;
 
 /**
- * 1) Purpose: Renders HollyBolly questions and rewards
- * 2) Features: Shows MCQ options, validates answer, shows XP + rewards
- * 3) Depends on: logic.js, gameUtils.js, questionsUtils.js
- * 4) Called by: hollybolly.js
- * 5) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
- * 6) Timestamp: 2025-06-04 12:33 | File: js/modes/hollybolly/renderer.js
- *
- * Functions:
- * - renderHollyBollyQuestion(q, difficulty)
- * - showHollyBollyReward(tier, rewards)
+ * Renders the current HollyBolly question in the UI.
+ * @param {HTMLElement} container - Target DOM element
  */
+function renderHollyBollyQuestion(container) {
+  if (!currentQuestion || !container) return showUserError('No question to display.');
 
-import { checkHollyBollyAnswer } from './logic.js';
-import { showResultFeedback, shuffleOptions } from '../../js/gameUtils.js';
-import { logEvent } from '../../js/eventLogger.js';
-
-/**
- * Renders a HollyBolly question with MCQ options.
- * @param {Object} q - Question object
- * @param {string} difficulty - easy | medium | hard
- */
-export function renderHollyBollyQuestion(q, difficulty = 'medium') {
-  const gameArea = document.getElementById('gameArea');
-  if (!gameArea) return;
-
-  gameArea.innerHTML = '';
+  container.innerHTML = '';
 
   const heading = document.createElement('h2');
   heading.textContent = '🎥 Guess the Movie!';
-  gameArea.appendChild(heading);
+  container.appendChild(heading);
 
-  const clue = document.createElement('p');
-  clue.textContent = q.clue;
-  gameArea.appendChild(clue);
+  const clues = document.createElement('div');
+  clues.className = 'clue-box';
+  clues.innerHTML = `
+    <p>🏞️ <strong>Place:</strong> ${currentQuestion.place}</p>
+    <p>🐾 <strong>Animal:</strong> ${currentQuestion.animal}</p>
+    <p>🎁 <strong>Thing:</strong> ${currentQuestion.thing}</p>
+  `;
+  container.appendChild(clues);
 
-  const options = shuffleOptions(q.options, difficulty);
-  const optionContainer = document.createElement('div');
-  optionContainer.className = 'mcq-options';
+  const options = [currentQuestion.movie, currentQuestion.bollywood];
+  const shown = shuffleArray(options).slice(0, maxOptions);
 
-  options.forEach(option => {
+  const mcqContainer = document.createElement('div');
+  mcqContainer.className = 'mcq-options-container';
+
+  shown.forEach(option => {
     const btn = document.createElement('button');
     btn.textContent = option;
-    btn.className = 'mcq-button';
-    btn.addEventListener('click', () => {
-      const { isCorrect, rewardTier } = checkHollyBollyAnswer(option, q.answer);
-      showResultFeedback(isCorrect, q.answer);
-      if (isCorrect && q.rewards) {
-        showHollyBollyReward(rewardTier, q.rewards);
-      }
-      setTimeout(() => {
-        document.dispatchEvent(new Event('nextQuestion'));
-      }, 1200);
-    });
-    optionContainer.appendChild(btn);
+    btn.className = 'mcq-btn';
+    btn.addEventListener('click', () => handleAnswer(option));
+    mcqContainer.appendChild(btn);
   });
 
-  gameArea.appendChild(optionContainer);
+  container.appendChild(mcqContainer);
 }
 
 /**
- * Displays reward info based on reward tier.
- * @param {number} tier - 1, 2, or 3
- * @param {Object} rewards - reward data from question
+ * Renders reward info based on current streak.
+ * @param {HTMLElement} container - DOM container to show rewards
+ * @param {Object} rewards - Reward data object
  */
-export function showHollyBollyReward(tier, rewards) {
+function renderReward(container, rewards) {
+  if (!container || !rewards) return;
+
   const rewardBox = document.createElement('div');
   rewardBox.className = 'reward-box';
 
-  let rewardHTML = '';
-  if (tier >= 1 && rewards.boxOffice) {
-    rewardHTML += `
-      <p>💰 <strong>Box Office</strong><br>
+  if (correctStreak >= 1 && rewards.boxOffice) {
+    rewardBox.innerHTML += `
+      <p>💰 <strong>Box Office:</strong><br>
       Hollywood: ${rewards.boxOffice.hollywood}<br>
       Bollywood: ${rewards.boxOffice.bollywood}</p>
     `;
   }
-  if (tier >= 2 && rewards.actorWorth) {
-    rewardHTML += `
-      <p>🎭 <strong>Main Actor Worth</strong><br>
+
+  if (correctStreak >= 2 && rewards.actorWorth) {
+    rewardBox.innerHTML += `
+      <p>🎭 <strong>Main Actor Net Worth:</strong><br>
       Hollywood: ${rewards.actorWorth.hollywood}<br>
       Bollywood: ${rewards.actorWorth.bollywood}</p>
     `;
   }
-  if (tier >= 3 && rewards.directorWorth) {
-    rewardHTML += `
-      <p>🎬 <strong>Director Net Worth</strong><br>
+
+  if (correctStreak >= 3 && rewards.directorWorth) {
+    rewardBox.innerHTML += `
+      <p>🎬 <strong>Director Net Worth:</strong><br>
       Hollywood: ${rewards.directorWorth.hollywood}<br>
       Bollywood: ${rewards.directorWorth.bollywood}</p>
     `;
   }
 
-  rewardBox.innerHTML = rewardHTML;
-  document.getElementById('gameArea').appendChild(rewardBox);
-  logEvent('reward_shown', { tier, rewards });
+  container.appendChild(rewardBox);
 }
+
+export {
+  renderHollyBollyQuestion,
+  renderReward
+};
 
 
