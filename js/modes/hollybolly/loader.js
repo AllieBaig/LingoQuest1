@@ -1,31 +1,51 @@
 
+/* 
+1) Purpose: Initializes and loads HollyBolly game mode
+2) Functions: startHollyBolly, loadNextQuestion, showCompletion
+3) Depends on: questionUtils.js, gameUtils.js, renderer.js
+4) Notes: Combines static UI logic with dynamic language-based question loading
+5) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
+6) Timestamp: 2025-06-03 23:59 | File: js/modes/hollybolly/loader.js
+*/
+
+import { safeLoadQuestions, verifyQuestionStructure, shuffleArray } from '../../questionUtils.js';
+import { logEvent } from '../../eventLogger.js';
+
+import { renderIngameHead, renderIngameFoot } from '../../gameUtils.js';
+import { renderHollyBollyQuestion } from './renderer.js';
+
+export let questionPool = [];
+export let answeredIDs = new Set();
+export let currentQuestion = null;
+export let difficulty = localStorage.getItem('game-difficulty') || 'medium';
 
 /**
- * 1) Purpose: Load HollyBolly questions from language JSON file
- * 2) Features: Loads questions dynamically based on answer language
- * 3) Called by: startHollyBolly() in hollybolly.js
- * 4) Related: lang/hollybolly-en.json
- * 5) MIT License: https://github.com/AllieBaig/LingoQuest2/blob/main/LICENSE
- * 6) Timestamp: 2025-06-03 22:55 | File: js/modes/hollybolly/loader.js
- * 
- * Functions:
- * - loadHollyBollyData(lang)
+ * Starts the HollyBolly game (UI setup, question loading)
  */
+export async function startHollyBolly() {
+  const gameArea = document.getElementById('gameArea');
+  if (!gameArea) return console.warn('Game area missing');
 
-import { safeLoadQuestions } from '../../js/questionsUtils.js';
+  gameArea.innerHTML = '';
+  gameArea.hidden = false;
+  document.getElementById('menuArea').hidden = true;
 
-/**
- * Load HollyBolly game questions based on selected answer language
- * @param {string} lang - Language code (e.g., "en", "fr")
- * @returns {Promise<Array>} - Array of question objects
- */
-export async function loadHollyBollyData(lang = 'en') {
-  const path = `lang/hollybolly-${lang}.json`;
+  renderIngameHead(gameArea);
+  renderIngameFoot(gameArea);
 
-  return await safeLoadQuestions(async () => {
-    const res = await fetch(path);
-    if (!res.ok) throw new Error(`Failed to fetch ${path}`);
-    return await res.json();
-  }, 'HollyBolly questions failed to load.');
+  const lang = localStorage.getItem('answer-language') || 'en';
+  const rawQuestions = await loadHollyBollyData(lang);
+  questionPool = shuffleArray(rawQuestions);
+  answeredIDs.clear();
+
+  logEvent('game_start', {
+    mode: 'hollybolly',
+    difficulty,
+    language: lang,
+    totalQuestions: questionPool.length
+  });
+
+  createSentenceBuilderArea(gameArea);
+  loadNextQuestion();
 }
 
