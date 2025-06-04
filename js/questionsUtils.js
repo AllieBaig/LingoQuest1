@@ -23,7 +23,7 @@ export async function safeLoadQuestions(loaderFunc, fallbackMsg = '❌ Failed to
     return result;
   } catch (err) {
     logError(fallbackMsg, err);
-    showUserError(fallbackMsg);
+    showErrorToUser(fallbackMsg);
     return [];
   }
 }
