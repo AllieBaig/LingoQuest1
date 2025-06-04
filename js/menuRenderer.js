@@ -19,7 +19,7 @@ export function renderGameMenu(containerId = 'menuArea') {
   grid.className = 'menu-grid';
 
   Object.values(gameModes)
-    .filter(mode => mode.active)
+    .filter(mode => mode.enabled)
     .forEach(({ id, emoji, title, modeKey }) => {
       const btn = document.createElement('button');
       btn.id = id;
