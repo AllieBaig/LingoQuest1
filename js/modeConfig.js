@@ -37,8 +37,8 @@ export const gameModes = {
     i18nKey: 'relic',
     folder: 'relic',
     entry: 'relic.js',
-    enabled: true,
-    auto: true
+    enabled: false,
+    auto: false
   },
   cinequest: {
     id: 'btnCineQuest',
@@ -59,8 +59,8 @@ export const gameModes = {
     i18nKey: 'hollybolly',
     folder: 'hollybolly',
     entry: 'hollybolly.js',
-    enabled: false,
-    auto: false
+    enabled: true,
+    auto: true
   },
   safari: {
     id: 'btnWordSafari',
