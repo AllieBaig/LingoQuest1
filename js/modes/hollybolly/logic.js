@@ -38,7 +38,7 @@ let streak = 0;
  * Starts the HollyBolly game with shuffled question pool.
  * @param {Array} pool 
  */
-export function startGame(pool) {
+function startGame(pool) {
   questionPool = shuffleArray(pool);
   answeredIDs.clear();
   streak = 0;
