@@ -14,6 +14,7 @@ export const gameModes = {
     i18nKey: 'mixlingo',
     folder: 'mixlingo',
     entry: 'mixlingo.js',
+    enabled: false
     auto: false
   },
   echoexp: {
@@ -23,6 +24,7 @@ export const gameModes = {
     i18nKey: 'echoexp',
     folder: 'echoexp',
     entry: 'echo-exp.js',
+    enabled: true,
     auto: true
   },
   relic: {
@@ -32,6 +34,7 @@ export const gameModes = {
     i18nKey: 'relic',
     folder: 'relic',
     entry: 'relic.js',
+    enabled: false,
     auto: false
   },
   cinequest: {
@@ -41,6 +44,7 @@ export const gameModes = {
     i18nKey: 'cinequest',
     folder: 'cinequest',
     entry: 'cinequest.js',
+    enabled: false,
     auto: false
   },
   hollybolly: {
@@ -50,6 +54,7 @@ export const gameModes = {
     i18nKey: 'hollybolly',
     folder: 'hollybolly',
     entry: 'hollybolly.js',
+    enabled: false,
     auto: false
   },
   safari: {
@@ -59,6 +64,7 @@ export const gameModes = {
     i18nKey: 'safari',
     folder: 'safari',
     entry: 'safari.js',
+    enabled: false,
     auto: false
   },
   dreammap: {
@@ -68,6 +74,8 @@ export const gameModes = {
     i18nKey: 'dreammap',
     folder: 'dreammap',
     entry: 'dreammap.js',
+    enabled: false,
     auto: false
   }
 };
+
