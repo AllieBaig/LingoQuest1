@@ -10,9 +10,10 @@
  * 7) Timestamp: 2025-06-03 22:52 | File: js/modes/hollybolly/hollybolly.js
  */
 
+
 import { loadHollyBollyData } from './loader.js';
-import { validateAnswer, unlockReward } from './logic.js';
-import { renderQuestion } from './renderer.js';
+import { validateAnswer, showFinalReward } from './logic.js';
+import { renderHollyBollyQuestion } from './renderer.js';
 
 import {
   logEvent,
@@ -45,7 +46,7 @@ export async function startHollyBolly() {
     questions = await loadHollyBollyData(lang);
     currentIndex = 0;
     logEvent('game_start', { mode: 'HollyBolly', total: questions.length });
-    renderQuestion(questions[currentIndex], difficulty);
+    renderHollyBollyQuestion(questions[currentIndex], difficulty);
   } catch (err) {
     showUserError('Failed to load HollyBolly data.');
   }
@@ -64,7 +65,7 @@ document.addEventListener('mcqSelected', async (e) => {
     incrementStreak();
 
     const streak = getStreak();
-    unlockReward(current, streak); // Shows boxOffice, actorWorth, directorWorth progressively
+    showFinalReward(current, streak); // Shows boxOffice, actorWorth, directorWorth progressively
     currentIndex++;
 
     if (currentIndex < questions.length) {
