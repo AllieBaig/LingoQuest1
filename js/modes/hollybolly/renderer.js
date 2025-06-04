@@ -17,7 +17,7 @@ import {
 import {
   optionCount,
   shuffleArray,
-  showUserError
+  showErrorToUser
 } from '../../modeHelper.js';
 
 const difficulty = localStorage.getItem('game-difficulty') || 'medium';
